@@ -20,7 +20,7 @@ def signup(payload: Signup):
         "email": payload.email,
         "password": hashed
     })
-    token = create_token(str(res.inserted_id), str(payload.name))
+    token = create_token(str(res.inserted_id), str(payload.name), str(payload.email))
     return {"ok": True, "token": token}
 
 @router.post("/login")
@@ -32,6 +32,6 @@ def login(payload: Login):
     if not verify_password(payload.password, user["password"]):
         raise HTTPException(400, "Invalid credentials")
 
-    token = create_token(str(user["_id"]), str(user["name"]))
+    token = create_token(str(user["_id"]), str(user["name"]), str(user["email"]))
 
     return {"ok": True, "token": token}

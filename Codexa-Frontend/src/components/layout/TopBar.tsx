@@ -21,6 +21,7 @@ import {
   Activity
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 interface Project {
   id: string;
@@ -62,7 +63,9 @@ export function TopBar({
   const [showProjectMenu, setShowProjectMenu] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-
+  const {user} = useAuth()
+  console.log(user);
+  
   const handleNewProject = () => {
     toast.success("Creating new project...", {
       description: "Your new project is being set up",
@@ -94,7 +97,7 @@ export function TopBar({
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-background animate-pulse" />
           </div>
           <div className="hidden sm:flex flex-col">
-            <span className="font-bold text-lg text-foreground leading-tight tracking-tight">NexusAI</span>
+            <span className="font-bold text-lg text-foreground leading-tight tracking-tight">CODEXA</span>
             <div className="flex items-center gap-1">
               <Crown className="w-3 h-3 text-amber-500" />
               <span className="text-[10px] text-amber-500 font-medium">Pro</span>
@@ -297,12 +300,12 @@ export function TopBar({
           >
             <div className="relative">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center text-xs font-bold text-white shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300 group-hover:scale-105">
-                JD
+                {user?.name ? user.name.charAt(0).toUpperCase() + user.name.charAt(1).toUpperCase() : "U"}
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-background" />
             </div>
             <div className="hidden xl:flex flex-col items-start">
-              <span className="text-sm font-medium text-foreground leading-tight">John Doe</span>
+              <span className="text-sm font-medium text-foreground leading-tight">{user?.name ? user?.name : "User Name"}</span>
               <span className="text-[10px] text-muted-foreground">Pro Plan</span>
             </div>
             <ChevronDown className={cn(
@@ -321,11 +324,11 @@ export function TopBar({
                   <div className="px-4 py-4 border-b border-border/50 bg-gradient-to-br from-secondary/50 to-secondary/20">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center text-lg font-bold text-white shadow-lg">
-                        JD
+                        {user?.name ? user.name.charAt(0).toUpperCase() + user.name.charAt(1).toUpperCase() : "U"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">John Doe</p>
-                        <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+                        <p className="text-sm font-semibold text-foreground truncate">{user.name ? user.name : "User Name"}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email? user.email : "john@example.com"}</p>
                         <div className="flex items-center gap-1 mt-1">
                           <Crown className="w-3 h-3 text-amber-500" />
                           <span className="text-xs text-amber-500 font-medium">Pro Plan</span>

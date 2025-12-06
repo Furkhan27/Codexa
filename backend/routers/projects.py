@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from utils.database_models import get_user_projects
+from utils.database_models import get_user_chats
 
 router = APIRouter(prefix="/projects")
 
@@ -8,7 +8,7 @@ def list_projects(user_id: str):
     """
     Return all projects created by a user.
     """
-    projects = get_user_projects(user_id)
+    projects = get_user_chats(user_id)
 
     return {
         "ok": True,

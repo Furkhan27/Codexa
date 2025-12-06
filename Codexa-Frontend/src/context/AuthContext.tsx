@@ -4,6 +4,7 @@ import {jwtDecode} from "jwt-decode";
 interface AuthContextType {
   token: string | null;
   userId: string | null;
+  user: {name: string | null, email: string | null} | null;
   setToken: (token: string | null) => void;
   logout: () => void;
 }
@@ -15,6 +16,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setTokenState] = useState<string | null>(
     localStorage.getItem("token")
   );
+  const [user, setUser] = useState({
+    name: null,
+    email: null,
+  });
 
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -23,6 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const decoded: any = jwtDecode(token);
       console.log(decoded);
+      setUser(decoded);
       return decoded.user_id || null; // "sub" contains user_id
     } catch {
       return null;
@@ -57,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, userId, setToken, logout }}>
+    <AuthContext.Provider value={{ token, userId, setToken, logout, user }}>
       {children}
     </AuthContext.Provider>
   );

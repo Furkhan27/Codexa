@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Plus,
   Trash2,
@@ -13,6 +14,7 @@ import {
   Search,
 } from "lucide-react";
 import { toast } from "sonner";
+import { set } from "date-fns";
 
 interface Chat {
   id: string;
@@ -26,17 +28,15 @@ interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   onSettingsClick: () => void;
-  onProjectSelect: (id: string) => void;
 }
 
 export function Sidebar({
   isOpen,
   onToggle,
   onSettingsClick,
-  onProjectSelect,
 }: SidebarProps) {
   const { userId } = useAuth();
-
+  const navigate = useNavigate();
   // Chat list is now PROJECT list
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeChat, setActiveChat] = useState("");
@@ -44,13 +44,12 @@ export function Sidebar({
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-
+  const { chatId} = useParams();
   // ============================================
   // 🚀 LOAD PROJECTS FROM BACKEND
   // ============================================
   useEffect(() => {
     if (!userId) return;
-
     const loadProjects = async () => {
       try {
         const res = await fetch(`http://localhost:8000/projects/${userId}`);
@@ -67,32 +66,39 @@ export function Sidebar({
           }));
 
           setChats(formatted);
-          if (formatted.length > 0) setActiveChat(formatted[0].id);
+          // if (formatted.length > 0) setActiveChat(formatted[0].id);
         }
       } catch (err) {
         console.error("Failed to load projects:", err);
       }
     };
-
+    setActiveChat(chatId || "");
     loadProjects();
-  }, [userId]);
+  }, [userId, chatId]);
 
+  const handleProjectClick = (chatID: string) => {
+  navigate(`/c/${chatID}`);
+  setActiveChat(chatID);
+};
   // ============================================
   // ➕ CREATE NEW LOCAL CHAT (Frontend Only)
   // ============================================
   const handleNewChat = () => {
-    const emojis = ["💬", "🚀", "⚡", "🎯", "💡", "🔥", "🌟", "🎨"];
-    const newChat: Chat = {
-      id: Date.now().toString(),
-      title: "New Project",
-      emoji: emojis[Math.floor(Math.random() * emojis.length)],
-      timestamp: "Just now",
-      preview: "Start building...",
-    };
+    // const emojis = ["💬", "🚀", "⚡", "🎯", "💡", "🔥", "🌟", "🎨"];
+    // const newChat: Chat = {
+    //   id: Date.now().toString(),
+    //   title: "New Project",
+    //   emoji: emojis[Math.floor(Math.random() * emojis.length)],
+    //   timestamp: "Just now",
+    //   preview: "Start building...",
+    // };
 
-    setChats((prev) => [newChat, ...prev]);
-    setActiveChat(newChat.id);
-    toast.success("New project created!");
+    // setChats((prev) => [newChat, ...prev]);
+    // setActiveChat(newChat.id);
+    
+    navigate("/")
+    setActiveChat("");
+    // toast.success("New project created!");
   };
 
   // ============================================
@@ -174,7 +180,7 @@ export function Sidebar({
           {isOpen && (
             <div>
               <span className="text-sm font-semibold text-foreground">
-                NexusAI
+                CODEXA
               </span>
               <span className="text-[10px] text-muted-foreground block">
                 Projects
@@ -220,7 +226,7 @@ export function Sidebar({
               key={chat.id}
               onClick={() => {
                 setActiveChat(chat.id);
-                onProjectSelect(chat.id);
+                handleProjectClick(chat.id);
               }}
               onMouseEnter={() => setHoveredChat(chat.id)}
               onMouseLeave={() => setHoveredChat(null)}

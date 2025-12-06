@@ -112,7 +112,7 @@ const AuthPage = () => {
         <p className="text-center text-gray-400 mb-8">
           {mode === "login"
             ? "Sign in to continue building amazing apps."
-            : "Create your NexusAI account to get started."}
+            : "Create your CODEXA account to get started."}
         </p>
 
         {/* FORM START */}

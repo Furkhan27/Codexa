@@ -41,7 +41,7 @@ class ProjectPipeline:
         save_message(project_id, "assistant", json.dumps(plan, indent=2), "planner")
         print(f"Planner generated steps:\n{(plan["title"])}\n")
         # 2. DEVELOPER
-        dev = DeveloperAgent().generate_project(plan["title"], plan["steps"])
+        dev = DeveloperAgent().generate_project(plan["title"], plan["steps"], user_message)
         save_message(project_id, "assistant", json.dumps(dev["code"]), "developer")
         
         # 3. DEBUGGER

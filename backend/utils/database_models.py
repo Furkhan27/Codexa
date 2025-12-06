@@ -1,12 +1,13 @@
-from utils.database import projects_col, messages_col
+from utils.database import chats_col, messages_col, projects_col
 from datetime import datetime
 from bson import ObjectId
 
 
-# ---------- PROJECTS ----------
 
-def create_project(user_id: str, title: str, description: str):
-    project = {
+# ---------- CHATS ----------
+
+def create_chat(user_id: str, title: str, description: str):
+    chat = {
         "user_id": user_id,
         "title": title,
         "description": description,
@@ -14,31 +15,31 @@ def create_project(user_id: str, title: str, description: str):
         "updated_at": datetime.utcnow()
     }
 
-    res = projects_col.insert_one(project)
+    res = chats_col.insert_one(chat)
     return str(res.inserted_id)
 
-def get_user_projects(user_id: str):
-    cursor = projects_col.find({"user_id": user_id}).sort("created_at", -1)
+def get_user_chats(user_id: str):
+    cursor = chats_col.find({"user_id": user_id}).sort("created_at", -1)
 
-    projects = []
+    chats = []
     for p in cursor:
         p["_id"] = str(p["_id"])
-        projects.append(p)
+        chats.append(p)
 
-    return projects
+    return chats
 
-def get_project(project_id: str):
-    project = projects_col.find_one({"_id": ObjectId(project_id)})
-    if not project:
+def get_project(chat_id: str):
+    chat = chats_col.find_one({"_id": ObjectId(chat_id)})
+    if not chat:
         return None
     
-    project["_id"] = str(project["_id"])
-    return project
+    chat["_id"] = str(chat["_id"])
+    return chat
 
 
-def update_project_timestamp(project_id: str):
-    projects_col.update_one(
-        {"_id": ObjectId(project_id)},
+def update_project_timestamp(chat_id: str):
+    chats_col.update_one(
+        {"_id": ObjectId(chat_id)},
         {"$set": {"updated_at": datetime.utcnow()}}
     )
 
@@ -52,9 +53,9 @@ def convert_messages_to_text(messages):
         lines.append(f"{role}: {m['content']}")
     return "\n".join(lines)
 
-def save_message(project_id: str, role: str, content: str, agent: str = None):
+def save_message(chat_id: str, role: str, content: str, agent: str = None):
     msg = {
-        "project_id": project_id,
+        "chat_id": chat_id,
         "role": role,              # "user" or "assistant"
         "content": content,
         "agent": agent,            # optional: planner / developer / debugger / chat
@@ -75,13 +76,12 @@ def format_for_gemini(messages):
 
     return formatted
 
-from utils.database import messages_col
-from bson import ObjectId
 
-def get_project_messages(project_id: str):
+
+def get_chat_messages(chat_id: str):
     try:
         msgs = list(
-            messages_col.find({"project_id": project_id})
+            messages_col.find({"chat_id": chat_id})
                         .sort("timestamp", 1)  # oldest → newest
         )
 
@@ -94,3 +94,20 @@ def get_project_messages(project_id: str):
     except Exception as e:
         print("Error loading messages:", e)
         return None
+
+
+# ---------- PROJECTS ----------
+def save_project(user_id: str, title: str, description: str, chat_id:str,code: str=None,code_language:dict = None):
+    project = {
+        "user_id": user_id,
+        "title": title,
+        "description": description,
+        "code": code,
+        "code_language":code_language,
+        "chat_id":chat_id,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
+    }
+
+    res = projects_col.insert_one(project)
+    return str(res.inserted_id)

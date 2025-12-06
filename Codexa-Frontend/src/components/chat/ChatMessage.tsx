@@ -132,7 +132,7 @@ export function ChatMessage({ message, index }: ChatMessageProps) {
               isUser ? "text-primary" : "text-muted-foreground"
             )}
           >
-            {isUser ? "You" : "NexusAI"}
+            {isUser ? "You" : "CODEXA"}
           </div>
 
           {/* Message Rendering */}

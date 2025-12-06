@@ -26,9 +26,17 @@ class ChatPayload(BaseModel):
     project_id is Optional because new projects start with None.
     """
     user_id: str
-    project_id: Optional[str]  # None = create a new project
+    chat_id: Optional[str]  # None = create a new project
     message: str
 
+class ProjectPayload(BaseModel):
+    user_id: str
+    title: str
+    description: Optional[str] = None
+    chat_id: str
+    code_language: Optional[str] = "Python"
+    code: Optional[str] = None
+    
 
 class GeneratePayload(BaseModel):
     """

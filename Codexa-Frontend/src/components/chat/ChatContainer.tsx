@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { PreviewPanel } from "../layout/PreviewPanel";
 import { CodePanel } from "../layout/CodePanel";
+import { useParams, useNavigate } from "react-router-dom";
 
 interface Message {
   id: string;
@@ -26,7 +27,7 @@ interface Message {
 }
 
 interface Props {
-  selectedProjectId: string | null;
+  selectedchatId: string | null;
   onCodeGenerated?: (code: string, lang: string, html: string) => void;
 }
 
@@ -49,12 +50,14 @@ const suggestions = [
   },
 ];
 
-export function ChatContainer({ selectedProjectId, onCodeGenerated }: Props) {
+export function ChatContainer({ onCodeGenerated }: Props) {
   const { userId } = useAuth();
+  const { chatId} = useParams();
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const navigate = useNavigate();
+  const [messages, setMessages] =  useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [projectId, setProjectId] = useState<string | null>(null);
+  // const [chatId, setchatId] = useState<string | null>(null);
 
   const [isCodeOpen, setIsCodeOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -75,11 +78,11 @@ export function ChatContainer({ selectedProjectId, onCodeGenerated }: Props) {
 
   // Load chat history
   useEffect(() => {
-    if (!selectedProjectId) return;
+    if (!chatId) setMessages([]);
 
     const loadChat = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/chat/${selectedProjectId}`);
+        const res = await fetch(`http://localhost:8000/chat/${chatId}`);
         const data = await res.json();
 
         if (data.ok && Array.isArray(data.messages)) {
@@ -91,7 +94,6 @@ export function ChatContainer({ selectedProjectId, onCodeGenerated }: Props) {
           }));
 
           setMessages(mapped);
-          setProjectId(selectedProjectId);
         }
       } catch (err) {
         console.error("Failed to load chat:", err);
@@ -99,12 +101,12 @@ export function ChatContainer({ selectedProjectId, onCodeGenerated }: Props) {
     };
 
     loadChat();
-  }, [selectedProjectId]);
+  }, [chatId]);
 
   // Handle send
   const handleSend = async (content: string) => {
     if (!content.trim()) return;
-
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -120,18 +122,17 @@ export function ChatContainer({ selectedProjectId, onCodeGenerated }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: userId,
-          project_id: projectId,
+          chat_id: chatId || null,
           message: content,
         }),
       });
 
       const data = await res.json();
-
-      // Create project id if new
-      if (!projectId && data.project_id) {
-        setProjectId(data.project_id);
+      console.log("Chat response data:", data);
+      
+      if (data.ok && data.chat_id) {
+        navigate(`/c/${data.chat_id}`);
       }
-
       const mappedMessages = data.messages?.map((msg: any) => ({
         id: msg._id,
         role: msg.role,
@@ -186,7 +187,7 @@ export function ChatContainer({ selectedProjectId, onCodeGenerated }: Props) {
             </div>
 
             <h1 className="text-4xl font-bold text-foreground mb-3 text-center">
-              Welcome to <span className="text-gradient-animate">NexusAI</span>
+              Welcome to <span className="text-gradient-animate">CODEXA</span>
             </h1>
 
             <p className="text-lg text-muted-foreground text-center mb-10 max-w-md">
@@ -265,7 +266,7 @@ export function ChatContainer({ selectedProjectId, onCodeGenerated }: Props) {
                     />
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    NexusAI is thinking...
+                    CODEXA is thinking...
                   </span>
                 </div>
               </div>

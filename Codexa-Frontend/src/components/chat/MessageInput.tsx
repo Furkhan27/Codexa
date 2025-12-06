@@ -60,7 +60,7 @@ export function MessageInput({ onSend, isLoading = false }: MessageInputProps) {
                 onKeyDown={handleKeyDown}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                placeholder="Ask NexusAI anything..."
+                placeholder="Ask CODEXA anything..."
                 className="w-full bg-transparent resize-none text-sm text-foreground placeholder:text-muted-foreground focus:outline-none max-h-[150px] scrollbar-thin leading-relaxed"
                 rows={1}
                 disabled={isLoading}

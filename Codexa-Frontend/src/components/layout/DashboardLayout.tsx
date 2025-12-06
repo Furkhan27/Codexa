@@ -6,6 +6,7 @@ import { CodePanel } from "./CodePanel";
 import { SplitPanel } from "./SplitPanel";
 import { ChatContainer } from "../chat/ChatContainer";
 import { SettingsPanel } from "../settings/SettingsPanel";
+import { useParams } from "react-router-dom";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -15,10 +16,11 @@ import {
 export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const {projectId} = useParams();
 
   // ✅ When a project is clicked in sidebar
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-
+  
   // Panels
   const [previewOpen, setPreviewOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
@@ -113,9 +115,6 @@ export function DashboardLayout() {
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
           onSettingsClick={() => setSettingsOpen(true)}
-          onProjectSelect={(id) => {
-            setSelectedProjectId(id);
-          }}
         />
 
         {/* Resizable Panels */}
@@ -125,7 +124,7 @@ export function DashboardLayout() {
           <ResizablePanel defaultSize={hasSidePanel ? 60 : 100} minSize={35}>
             <main className="h-full flex flex-col overflow-hidden">
               <ChatContainer
-                selectedProjectId={selectedProjectId}
+                selectedchatId={selectedProjectId}
                 onCodeGenerated={(code, lang, html) => {
                   setGeneratedCode(code);
                   setGeneratedLanguage(lang);

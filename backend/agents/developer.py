@@ -44,25 +44,40 @@ class DeveloperAgent:
             return code.strip()
         return None
 
-    def generate_project(self, project_name: str, steps: str):
+    def generate_project(self, project_name: str, steps: str, user_message: str):
         """Generate a single HTML file based on PlannerAgent steps."""
         # 1️⃣ Generate steps
         print(f"Generated steps:\n{steps}\n")
 
         # 2️⃣ Prepare prompt for code generation
-        prompt = f"Write a complete HTML file with inline CSS and JavaScript implementing the following steps:\n"
+        prompt = f"""
+        You are the Developer Agent of CODEXA.
+
+        Your task is to generate a complete working HTML file
+        (with inline CSS and JavaScript) based on the user's idea.
+
+        USER IDEA:
+        {user_message}
+
+        PROJECT PLAN (from Planner Agent):
+        """
         for i, step in enumerate(steps, 1):
-            prompt += f"{i}. {step}\n"
+            prompt += f"- {step}\n"
 
         prompt += """
-        Do NOT include any explanation, steps, or comments. 
-        Do NOT generate the code explaining anything.
-Requirements:
-- Include buttons, inputs, display areas as needed
-- Use JavaScript to implement interactive behavior for each step
-- Inline CSS for styling
-- Return only the complete HTML code
-"""
+        Build the actual full implementation of the user's idea.
+        Do NOT create anything related to steps, checklists, simulations, or placeholders.
+
+        Requirements:
+        - Use inline CSS for styling.
+        - Use JavaScript for functional behavior.
+        - Build a clean, modern, realistic UI based on the user's idea.
+        - Fully implement core functionality.
+        - Do NOT include explanations or comments.
+        - Return ONLY a complete <html>...</html> file.
+        """
+
+
 
         code = self._generate_code(prompt)
         if not code:

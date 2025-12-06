@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Toggle } from "@/components/ui/Toggle";
+import { Toggle } from "@/components/ui/toggle";
+import { useAuth } from "@/context/AuthContext";
 import {
   X,
   User,
@@ -39,6 +40,8 @@ interface SettingsPanelProps {
 
 type SettingsTab = "account" | "appearance" | "notifications" | "privacy" | "shortcuts" | "language" | "ai";
 type ThemeType = "light" | "dark" | "original" | "gray" | "custom";
+
+const {userId} = useAuth();
 
 const tabs = [
   { id: "account" as SettingsTab, label: "Account", icon: User },
@@ -292,7 +295,7 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
   const handleModelChange = (index: number) => {
     setSelectedModel(index);
-    const modelNames = ["NexusAI Pro", "NexusAI Fast", "NexusAI Light"];
+    const modelNames = ["CODEXA Pro", "CODEXA Fast", "CODEXA Light"];
     toast.success(`Switched to ${modelNames[index]}`);
   };
 
@@ -484,7 +487,7 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
               <div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">Appearance</h3>
                 <p className="text-sm text-muted-foreground">
-                  Customize how NexusAI looks and feels on your device.
+                  Customize how CODEXA looks and feels on your device.
                 </p>
               </div>
 
@@ -677,7 +680,7 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
               <div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">AI Settings</h3>
                 <p className="text-sm text-muted-foreground">
-                  Configure how NexusAI responds and generates content.
+                  Configure how CODEXA responds and generates content.
                 </p>
               </div>
 
@@ -686,9 +689,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                 <h4 className="text-sm font-medium text-foreground">AI Model</h4>
                 <div className="space-y-2">
                   {[
-                    { name: "NexusAI Pro", desc: "Most capable, best for complex tasks", badge: "Recommended", tokens: "8K context" },
-                    { name: "NexusAI Fast", desc: "Optimized for speed", badge: null, tokens: "4K context" },
-                    { name: "NexusAI Light", desc: "Lightweight, cost-effective", badge: null, tokens: "2K context" },
+                    { name: "CODEXA Pro", desc: "Most capable, best for complex tasks", badge: "Recommended", tokens: "8K context" },
+                    { name: "CODEXA Fast", desc: "Optimized for speed", badge: null, tokens: "4K context" },
+                    { name: "CODEXA Light", desc: "Lightweight, cost-effective", badge: null, tokens: "2K context" },
                   ].map((model, index) => (
                     <button
                       key={index}

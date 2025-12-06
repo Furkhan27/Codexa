@@ -8,5 +8,6 @@ client = MongoClient(MONGO_URI)
 db = client[MONGO_DB]
 
 users_col = db["users"]
-projects_col = db["projects"]
+chats_col = db["chats"]
 messages_col = db["messages"]
+projects_col = db["projects"]

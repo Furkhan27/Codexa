@@ -17,10 +17,11 @@ def verify_password(password: str, hashed: bytes):
     pw = password.encode("utf-8")[:72]
     return bcrypt.checkpw(pw, hashed)
 
-def create_token(user_id: str, name: str = ""):
+def create_token(user_id: str, name: str = "", email: str = ""):
     payload = {
         "user_id": user_id,
         "name": name,
+        "email":email,
         "exp": datetime.utcnow() + timedelta(days=7)
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGO)
