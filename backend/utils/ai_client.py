@@ -12,4 +12,9 @@ if not API_KEY:
 # Correct client initialization
 gemini = genai.Client(api_key=API_KEY)
 
-print("Gemini client initialized successfully")
+res = gemini.models._generate_content(
+    model="gemini-2.0-flash",
+    contents="Hello, Gemini!"
+)
+
+print("Gemini client initialized successfully", res)

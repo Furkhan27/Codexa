@@ -38,30 +38,95 @@ interface SettingsPanelProps {
   onThemeChange: (isDark: boolean) => void;
 }
 
-type SettingsTab = "account" | "appearance" | "notifications" | "privacy" | "shortcuts" | "language" | "ai";
+type SettingsTab =
+  | "account"
+  | "appearance"
+  | "notifications"
+  | "privacy"
+  | "shortcuts"
+  | "language"
+  | "ai";
 type ThemeType = "light" | "dark" | "original" | "gray" | "custom";
-
-const {userId} = useAuth();
 
 const tabs = [
   { id: "account" as SettingsTab, label: "Account", icon: User },
   { id: "appearance" as SettingsTab, label: "Appearance", icon: Palette },
   { id: "notifications" as SettingsTab, label: "Notifications", icon: Bell },
   { id: "privacy" as SettingsTab, label: "Privacy & Security", icon: Shield },
-  { id: "shortcuts" as SettingsTab, label: "Keyboard Shortcuts", icon: Keyboard },
+  {
+    id: "shortcuts" as SettingsTab,
+    label: "Keyboard Shortcuts",
+    icon: Keyboard,
+  },
   { id: "language" as SettingsTab, label: "Language", icon: Globe },
   { id: "ai" as SettingsTab, label: "AI Settings", icon: Zap },
 ];
 
 const accentColors = [
-  { name: "Cyan", hue: "187", saturation: "100%", lightness: "42%", darkLightness: "35%", isTransparent: false },
-  { name: "Blue", hue: "217", saturation: "91%", lightness: "60%", darkLightness: "50%", isTransparent: false },
-  { name: "Violet", hue: "262", saturation: "80%", lightness: "60%", darkLightness: "55%", isTransparent: false },
-  { name: "Pink", hue: "330", saturation: "81%", lightness: "60%", darkLightness: "55%", isTransparent: false },
-  { name: "Emerald", hue: "160", saturation: "84%", lightness: "39%", darkLightness: "35%", isTransparent: false },
-  { name: "Amber", hue: "38", saturation: "92%", lightness: "50%", darkLightness: "45%", isTransparent: false },
-  { name: "Rose", hue: "350", saturation: "89%", lightness: "60%", darkLightness: "55%", isTransparent: false },
-  { name: "Transparent", hue: "0", saturation: "0%", lightness: "100%", darkLightness: "100%", isTransparent: true },
+  {
+    name: "Cyan",
+    hue: "187",
+    saturation: "100%",
+    lightness: "42%",
+    darkLightness: "35%",
+    isTransparent: false,
+  },
+  {
+    name: "Blue",
+    hue: "217",
+    saturation: "91%",
+    lightness: "60%",
+    darkLightness: "50%",
+    isTransparent: false,
+  },
+  {
+    name: "Violet",
+    hue: "262",
+    saturation: "80%",
+    lightness: "60%",
+    darkLightness: "55%",
+    isTransparent: false,
+  },
+  {
+    name: "Pink",
+    hue: "330",
+    saturation: "81%",
+    lightness: "60%",
+    darkLightness: "55%",
+    isTransparent: false,
+  },
+  {
+    name: "Emerald",
+    hue: "160",
+    saturation: "84%",
+    lightness: "39%",
+    darkLightness: "35%",
+    isTransparent: false,
+  },
+  {
+    name: "Amber",
+    hue: "38",
+    saturation: "92%",
+    lightness: "50%",
+    darkLightness: "45%",
+    isTransparent: false,
+  },
+  {
+    name: "Rose",
+    hue: "350",
+    saturation: "89%",
+    lightness: "60%",
+    darkLightness: "55%",
+    isTransparent: false,
+  },
+  {
+    name: "Transparent",
+    hue: "0",
+    saturation: "0%",
+    lightness: "100%",
+    darkLightness: "100%",
+    isTransparent: true,
+  },
 ];
 
 const languages = [
@@ -100,32 +165,71 @@ const saveSetting = (key: string, value: unknown) => {
   localStorage.setItem(`nexus-${key}`, JSON.stringify(value));
 };
 
-export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: SettingsPanelProps) {
+export function SettingsPanel({
+  isOpen,
+  onClose,
+  isDark,
+  onThemeChange,
+}: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("appearance");
-  const [theme, setTheme] = useState<ThemeType>(() => loadSetting("theme", isDark ? "dark" : "light"));
-  const [selectedModel, setSelectedModel] = useState(() => loadSetting("model", 0));
-  const [responseStyle, setResponseStyle] = useState(() => loadSetting("response-style", 1));
-  const [selectedAccent, setSelectedAccent] = useState(() => loadSetting("accent-color", 0));
+  const [theme, setTheme] = useState<ThemeType>(() =>
+    loadSetting("theme", isDark ? "dark" : "light")
+  );
+  const [selectedModel, setSelectedModel] = useState(() =>
+    loadSetting("model", 0)
+  );
+  const [responseStyle, setResponseStyle] = useState(() =>
+    loadSetting("response-style", 1)
+  );
+  const [selectedAccent, setSelectedAccent] = useState(() =>
+    loadSetting("accent-color", 0)
+  );
   const [fontSize, setFontSize] = useState(() => loadSetting("font-size", 16));
-  const [animationsEnabled, setAnimationsEnabled] = useState(() => loadSetting("animations", true));
-  const [notificationsEnabled, setNotificationsEnabled] = useState(() => loadSetting("notifications", true));
-  const [soundEnabled, setSoundEnabled] = useState(() => loadSetting("sound", true));
-  const [emailNotifications, setEmailNotifications] = useState(() => loadSetting("email-notifications", true));
-  const [selectedLanguage, setSelectedLanguage] = useState(() => loadSetting("language", "en"));
+  const [animationsEnabled, setAnimationsEnabled] = useState(() =>
+    loadSetting("animations", true)
+  );
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() =>
+    loadSetting("notifications", true)
+  );
+  const [soundEnabled, setSoundEnabled] = useState(() =>
+    loadSetting("sound", true)
+  );
+  const [emailNotifications, setEmailNotifications] = useState(() =>
+    loadSetting("email-notifications", true)
+  );
+  const [selectedLanguage, setSelectedLanguage] = useState(() =>
+    loadSetting("language", "en")
+  );
   const [showPassword, setShowPassword] = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(() => loadSetting("2fa", false));
-  const [dataCollection, setDataCollection] = useState(() => loadSetting("data-collection", true));
-  const [codeFormatting, setCodeFormatting] = useState(() => loadSetting("code-formatting", true));
-  const [streamingEnabled, setStreamingEnabled] = useState(() => loadSetting("streaming", true));
-  const [compactMode, setCompactMode] = useState(() => loadSetting("compact-mode", false));
-  const [autoSave, setAutoSave] = useState(() => loadSetting("auto-save", true));
-  const [customColor, setCustomColor] = useState(() => loadSetting("custom-color", "#3b82f6"));
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(() =>
+    loadSetting("2fa", false)
+  );
+  const [dataCollection, setDataCollection] = useState(() =>
+    loadSetting("data-collection", true)
+  );
+  const [codeFormatting, setCodeFormatting] = useState(() =>
+    loadSetting("code-formatting", true)
+  );
+  const [streamingEnabled, setStreamingEnabled] = useState(() =>
+    loadSetting("streaming", true)
+  );
+  const [compactMode, setCompactMode] = useState(() =>
+    loadSetting("compact-mode", false)
+  );
+  const [autoSave, setAutoSave] = useState(() =>
+    loadSetting("auto-save", true)
+  );
+  const [customColor, setCustomColor] = useState(() =>
+    loadSetting("custom-color", "#3b82f6")
+  );
+
+  const { userId } = useAuth();
 
   // Apply accent color to CSS variables
   useEffect(() => {
     const color = accentColors[selectedAccent];
     const root = document.documentElement;
-    
+
     if (color.isTransparent) {
       // Transparent accent - use muted foreground color
       root.style.setProperty("--primary", "215 20% 55%");
@@ -134,16 +238,46 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
       root.style.setProperty("--gradient-start", "215 20% 55%");
     } else {
       // Set primary color based on theme
-      if (isDark || theme === "dark" || theme === "original" || theme === "gray" || theme === "custom") {
-        root.style.setProperty("--primary", `${color.hue} ${color.saturation} ${color.lightness}`);
-        root.style.setProperty("--ring", `${color.hue} ${color.saturation} ${color.lightness}`);
-        root.style.setProperty("--glow-primary", `${color.hue} ${color.saturation} ${color.lightness}`);
-        root.style.setProperty("--gradient-start", `${color.hue} ${color.saturation} ${color.lightness}`);
+      if (
+        isDark ||
+        theme === "dark" ||
+        theme === "original" ||
+        theme === "gray" ||
+        theme === "custom"
+      ) {
+        root.style.setProperty(
+          "--primary",
+          `${color.hue} ${color.saturation} ${color.lightness}`
+        );
+        root.style.setProperty(
+          "--ring",
+          `${color.hue} ${color.saturation} ${color.lightness}`
+        );
+        root.style.setProperty(
+          "--glow-primary",
+          `${color.hue} ${color.saturation} ${color.lightness}`
+        );
+        root.style.setProperty(
+          "--gradient-start",
+          `${color.hue} ${color.saturation} ${color.lightness}`
+        );
       } else {
-        root.style.setProperty("--primary", `${color.hue} ${color.saturation} ${color.darkLightness}`);
-        root.style.setProperty("--ring", `${color.hue} ${color.saturation} ${color.darkLightness}`);
-        root.style.setProperty("--glow-primary", `${color.hue} ${color.saturation} ${color.darkLightness}`);
-        root.style.setProperty("--gradient-start", `${color.hue} ${color.saturation} ${color.darkLightness}`);
+        root.style.setProperty(
+          "--primary",
+          `${color.hue} ${color.saturation} ${color.darkLightness}`
+        );
+        root.style.setProperty(
+          "--ring",
+          `${color.hue} ${color.saturation} ${color.darkLightness}`
+        );
+        root.style.setProperty(
+          "--glow-primary",
+          `${color.hue} ${color.saturation} ${color.darkLightness}`
+        );
+        root.style.setProperty(
+          "--gradient-start",
+          `${color.hue} ${color.saturation} ${color.darkLightness}`
+        );
       }
     }
     saveSetting("accent-color", selectedAccent);
@@ -151,7 +285,10 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
   // Apply font size as CSS variable and persist
   useEffect(() => {
-    document.documentElement.style.setProperty("--user-font-size", `${fontSize}px`);
+    document.documentElement.style.setProperty(
+      "--user-font-size",
+      `${fontSize}px`
+    );
     saveSetting("font-size", fontSize);
   }, [fontSize]);
 
@@ -166,48 +303,84 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
   }, [animationsEnabled]);
 
   // Persist other settings
-  useEffect(() => { saveSetting("theme", theme); }, [theme]);
-  useEffect(() => { saveSetting("model", selectedModel); }, [selectedModel]);
-  useEffect(() => { saveSetting("response-style", responseStyle); }, [responseStyle]);
-  useEffect(() => { saveSetting("notifications", notificationsEnabled); }, [notificationsEnabled]);
-  useEffect(() => { saveSetting("sound", soundEnabled); }, [soundEnabled]);
-  useEffect(() => { saveSetting("email-notifications", emailNotifications); }, [emailNotifications]);
-  useEffect(() => { saveSetting("language", selectedLanguage); }, [selectedLanguage]);
-  useEffect(() => { saveSetting("2fa", twoFactorEnabled); }, [twoFactorEnabled]);
-  useEffect(() => { saveSetting("data-collection", dataCollection); }, [dataCollection]);
-  useEffect(() => { saveSetting("code-formatting", codeFormatting); }, [codeFormatting]);
-  useEffect(() => { saveSetting("streaming", streamingEnabled); }, [streamingEnabled]);
-  useEffect(() => { saveSetting("compact-mode", compactMode); }, [compactMode]);
-  useEffect(() => { saveSetting("auto-save", autoSave); }, [autoSave]);
-  useEffect(() => { saveSetting("custom-color", customColor); }, [customColor]);
+  useEffect(() => {
+    saveSetting("theme", theme);
+  }, [theme]);
+  useEffect(() => {
+    saveSetting("model", selectedModel);
+  }, [selectedModel]);
+  useEffect(() => {
+    saveSetting("response-style", responseStyle);
+  }, [responseStyle]);
+  useEffect(() => {
+    saveSetting("notifications", notificationsEnabled);
+  }, [notificationsEnabled]);
+  useEffect(() => {
+    saveSetting("sound", soundEnabled);
+  }, [soundEnabled]);
+  useEffect(() => {
+    saveSetting("email-notifications", emailNotifications);
+  }, [emailNotifications]);
+  useEffect(() => {
+    saveSetting("language", selectedLanguage);
+  }, [selectedLanguage]);
+  useEffect(() => {
+    saveSetting("2fa", twoFactorEnabled);
+  }, [twoFactorEnabled]);
+  useEffect(() => {
+    saveSetting("data-collection", dataCollection);
+  }, [dataCollection]);
+  useEffect(() => {
+    saveSetting("code-formatting", codeFormatting);
+  }, [codeFormatting]);
+  useEffect(() => {
+    saveSetting("streaming", streamingEnabled);
+  }, [streamingEnabled]);
+  useEffect(() => {
+    saveSetting("compact-mode", compactMode);
+  }, [compactMode]);
+  useEffect(() => {
+    saveSetting("auto-save", autoSave);
+  }, [autoSave]);
+  useEffect(() => {
+    saveSetting("custom-color", customColor);
+  }, [customColor]);
 
   // Helper function to apply custom color
   const applyCustomColor = (color: string) => {
     const root = document.documentElement;
     // Convert hex to HSL
-    const hex = color.replace('#', '');
+    const hex = color.replace("#", "");
     const r = parseInt(hex.substr(0, 2), 16) / 255;
     const g = parseInt(hex.substr(2, 2), 16) / 255;
     const b = parseInt(hex.substr(4, 2), 16) / 255;
-    
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0, s = 0;
+
+    const max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    let h = 0,
+      s = 0;
     const l = (max + min) / 2;
 
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
       switch (max) {
-        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / d + 2) / 6; break;
-        case b: h = ((r - g) / d + 4) / 6; break;
+        case r:
+          h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+          break;
+        case g:
+          h = ((b - r) / d + 2) / 6;
+          break;
+        case b:
+          h = ((r - g) / d + 4) / 6;
+          break;
       }
     }
 
     const hue = Math.round(h * 360);
     const sat = Math.round(s * 100);
     const light = Math.round(l * 100);
-    
+
     root.style.setProperty("--custom-primary", `${hue} ${sat}% ${light}%`);
     root.style.setProperty("--primary", `${hue} ${sat}% ${light}%`);
     root.style.setProperty("--ring", `${hue} ${sat}% ${light}%`);
@@ -229,10 +402,10 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
   const handleThemeChange = (newTheme: ThemeType) => {
     setTheme(newTheme);
     const root = document.documentElement;
-    
+
     // Remove all theme classes
     root.classList.remove("light", "dark", "original", "gray", "custom");
-    
+
     if (newTheme === "light") {
       root.classList.add("light");
       onThemeChange(false);
@@ -351,7 +524,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
         {/* Sidebar */}
         <div className="w-64 border-r border-border/50 p-4 pt-16 bg-secondary/20">
-          <h2 className="text-lg font-semibold text-foreground mb-6 px-3">Settings</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-6 px-3">
+            Settings
+          </h2>
           <nav className="space-y-1">
             {tabs.map((tab) => (
               <button
@@ -366,7 +541,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
               >
                 <tab.icon className="w-5 h-5" />
                 <span>{tab.label}</span>
-                {activeTab === tab.id && <ChevronRight className="w-4 h-4 ml-auto" />}
+                {activeTab === tab.id && (
+                  <ChevronRight className="w-4 h-4 ml-auto" />
+                )}
               </button>
             ))}
           </nav>
@@ -378,7 +555,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
           {activeTab === "account" && (
             <div className="space-y-8 animate-fade-in-up">
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Account</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Account
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Manage your account information and preferences.
                 </p>
@@ -398,7 +577,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                   </div>
                   <div className="flex-1 space-y-3">
                     <div>
-                      <label className="text-xs text-muted-foreground">Display Name</label>
+                      <label className="text-xs text-muted-foreground">
+                        Display Name
+                      </label>
                       <input
                         type="text"
                         defaultValue="John Doe"
@@ -406,7 +587,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-muted-foreground">Email</label>
+                      <label className="text-xs text-muted-foreground">
+                        Email
+                      </label>
                       <div className="flex items-center gap-2 mt-1">
                         <input
                           type="email"
@@ -422,10 +605,14 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
               {/* Password Section */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-foreground">Change Password</h4>
+                <h4 className="text-sm font-medium text-foreground">
+                  Change Password
+                </h4>
                 <div className="space-y-3 p-4 rounded-xl border border-border/50 bg-secondary/20">
                   <div>
-                    <label className="text-xs text-muted-foreground">Current Password</label>
+                    <label className="text-xs text-muted-foreground">
+                      Current Password
+                    </label>
                     <div className="relative mt-1">
                       <input
                         type={showPassword ? "text" : "password"}
@@ -436,12 +623,18 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs text-muted-foreground">New Password</label>
+                    <label className="text-xs text-muted-foreground">
+                      New Password
+                    </label>
                     <input
                       type="password"
                       placeholder="••••••••"
@@ -449,7 +642,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                     />
                   </div>
                   <button
-                    onClick={() => toast.success("Password updated successfully")}
+                    onClick={() =>
+                      toast.success("Password updated successfully")
+                    }
                     className="w-full mt-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                   >
                     Update Password
@@ -459,17 +654,25 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
               {/* Danger Zone */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-destructive">Danger Zone</h4>
+                <h4 className="text-sm font-medium text-destructive">
+                  Danger Zone
+                </h4>
                 <div className="p-4 rounded-xl border border-destructive/30 bg-destructive/5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-foreground">Delete Account</p>
+                      <p className="text-sm font-medium text-foreground">
+                        Delete Account
+                      </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Permanently delete your account and all data
                       </p>
                     </div>
                     <button
-                      onClick={() => toast.error("Account deletion requires confirmation via email")}
+                      onClick={() =>
+                        toast.error(
+                          "Account deletion requires confirmation via email"
+                        )
+                      }
                       className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium hover:bg-destructive/90 transition-colors flex items-center gap-2"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -485,7 +688,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
           {activeTab === "appearance" && (
             <div className="space-y-8 animate-fade-in-up">
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Appearance</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Appearance
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Customize how CODEXA looks and feels on your device.
                 </p>
@@ -496,11 +701,36 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                 <h4 className="text-sm font-medium text-foreground">Theme</h4>
                 <div className="grid grid-cols-5 gap-3">
                   {[
-                    { id: "light" as ThemeType, label: "Light", icon: Sun, bgClass: "bg-white border border-gray-200" },
-                    { id: "dark" as ThemeType, label: "Dark", icon: Moon, bgClass: "bg-black" },
-                    { id: "original" as ThemeType, label: "Original", icon: Sparkles, bgClass: "bg-[#0d1321]" },
-                    { id: "gray" as ThemeType, label: "Gray", icon: Monitor, bgClass: "bg-gray-500" },
-                    { id: "custom" as ThemeType, label: "Custom", icon: Palette, bgClass: "" },
+                    {
+                      id: "light" as ThemeType,
+                      label: "Light",
+                      icon: Sun,
+                      bgClass: "bg-white border border-gray-200",
+                    },
+                    {
+                      id: "dark" as ThemeType,
+                      label: "Dark",
+                      icon: Moon,
+                      bgClass: "bg-black",
+                    },
+                    {
+                      id: "original" as ThemeType,
+                      label: "Original",
+                      icon: Sparkles,
+                      bgClass: "bg-[#0d1321]",
+                    },
+                    {
+                      id: "gray" as ThemeType,
+                      label: "Gray",
+                      icon: Monitor,
+                      bgClass: "bg-gray-500",
+                    },
+                    {
+                      id: "custom" as ThemeType,
+                      label: "Custom",
+                      icon: Palette,
+                      bgClass: "",
+                    },
                   ].map((option) => (
                     <button
                       key={option.id}
@@ -517,22 +747,39 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                           "w-10 h-10 rounded-lg flex items-center justify-center",
                           option.bgClass,
                           option.id === "custom" && "overflow-hidden",
-                          !option.bgClass && (theme === option.id
-                            ? "bg-primary/20 text-primary"
-                            : "bg-secondary text-muted-foreground")
+                          !option.bgClass &&
+                            (theme === option.id
+                              ? "bg-primary/20 text-primary"
+                              : "bg-secondary text-muted-foreground")
                         )}
-                        style={option.id === "custom" ? { backgroundColor: customColor } : undefined}
+                        style={
+                          option.id === "custom"
+                            ? { backgroundColor: customColor }
+                            : undefined
+                        }
                       >
-                        {option.id === "light" && <option.icon className="w-5 h-5 text-yellow-500" />}
-                        {option.id === "dark" && <option.icon className="w-5 h-5 text-white" />}
-                        {option.id === "original" && <option.icon className="w-5 h-5 text-cyan-400" />}
-                        {option.id === "gray" && <option.icon className="w-5 h-5 text-white" />}
-                        {option.id === "custom" && <option.icon className="w-5 h-5 text-white" />}
+                        {option.id === "light" && (
+                          <option.icon className="w-5 h-5 text-yellow-500" />
+                        )}
+                        {option.id === "dark" && (
+                          <option.icon className="w-5 h-5 text-white" />
+                        )}
+                        {option.id === "original" && (
+                          <option.icon className="w-5 h-5 text-cyan-400" />
+                        )}
+                        {option.id === "gray" && (
+                          <option.icon className="w-5 h-5 text-white" />
+                        )}
+                        {option.id === "custom" && (
+                          <option.icon className="w-5 h-5 text-white" />
+                        )}
                       </div>
                       <span
                         className={cn(
                           "text-xs font-medium",
-                          theme === option.id ? "text-primary" : "text-foreground"
+                          theme === option.id
+                            ? "text-primary"
+                            : "text-foreground"
                         )}
                       >
                         {option.label}
@@ -545,13 +792,17 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
               {/* Custom Theme Color Picker */}
               {theme === "custom" && (
                 <div className="space-y-4 p-4 rounded-xl border border-primary/30 bg-primary/5">
-                  <h4 className="text-sm font-medium text-foreground">Custom Theme Color</h4>
+                  <h4 className="text-sm font-medium text-foreground">
+                    Custom Theme Color
+                  </h4>
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <input
                         type="color"
                         value={customColor}
-                        onChange={(e) => handleCustomColorChange(e.target.value)}
+                        onChange={(e) =>
+                          handleCustomColorChange(e.target.value)
+                        }
                         className="w-16 h-16 rounded-xl cursor-pointer border-2 border-border/50"
                       />
                     </div>
@@ -560,7 +811,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                         <input
                           type="text"
                           value={customColor}
-                          onChange={(e) => handleCustomColorChange(e.target.value)}
+                          onChange={(e) =>
+                            handleCustomColorChange(e.target.value)
+                          }
                           placeholder="#3b82f6"
                           className="flex-1 px-3 py-2 text-sm bg-secondary border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                         />
@@ -575,7 +828,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
               {/* Accent Color */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-foreground">Accent Color</h4>
+                <h4 className="text-sm font-medium text-foreground">
+                  Accent Color
+                </h4>
                 <div className="flex items-center gap-3 flex-wrap">
                   {accentColors.map((color, index) => (
                     <button
@@ -585,7 +840,8 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                       className={cn(
                         "w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 relative",
                         getAccentColorClass(index),
-                        selectedAccent === index && "ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110"
+                        selectedAccent === index &&
+                          "ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110"
                       )}
                     >
                       {selectedAccent === index && (
@@ -604,7 +860,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
               {/* Font Size */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-medium text-foreground">Font Size</h4>
+                  <h4 className="text-sm font-medium text-foreground">
+                    Font Size
+                  </h4>
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
@@ -638,28 +896,39 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
               {/* Animations Toggle */}
               <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                 <div>
-                  <h4 className="text-sm font-medium text-foreground">Enable Animations</h4>
+                  <h4 className="text-sm font-medium text-foreground">
+                    Enable Animations
+                  </h4>
                   <p className="text-xs text-muted-foreground mt-1">
                     Show smooth transitions and micro-interactions
                   </p>
                 </div>
-                <Toggle enabled={animationsEnabled} onToggle={handleAnimationsToggle} />
+                <Toggle
+                  enabled={animationsEnabled}
+                  onToggle={handleAnimationsToggle}
+                />
               </div>
 
               {/* Compact Mode Toggle */}
               <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                 <div>
-                  <h4 className="text-sm font-medium text-foreground">Compact Mode</h4>
+                  <h4 className="text-sm font-medium text-foreground">
+                    Compact Mode
+                  </h4>
                   <p className="text-xs text-muted-foreground mt-1">
                     Reduce spacing and padding for a denser layout
                   </p>
                 </div>
-                <Toggle 
-                  enabled={compactMode} 
+                <Toggle
+                  enabled={compactMode}
                   onToggle={() => {
                     setCompactMode(!compactMode);
-                    toast.success(compactMode ? "Compact mode disabled" : "Compact mode enabled");
-                  }} 
+                    toast.success(
+                      compactMode
+                        ? "Compact mode disabled"
+                        : "Compact mode enabled"
+                    );
+                  }}
                 />
               </div>
 
@@ -678,7 +947,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
           {activeTab === "ai" && (
             <div className="space-y-8 animate-fade-in-up">
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">AI Settings</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  AI Settings
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Configure how CODEXA responds and generates content.
                 </p>
@@ -686,12 +957,29 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
               {/* Model Selection */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-foreground">AI Model</h4>
+                <h4 className="text-sm font-medium text-foreground">
+                  AI Model
+                </h4>
                 <div className="space-y-2">
                   {[
-                    { name: "CODEXA Pro", desc: "Most capable, best for complex tasks", badge: "Recommended", tokens: "8K context" },
-                    { name: "CODEXA Fast", desc: "Optimized for speed", badge: null, tokens: "4K context" },
-                    { name: "CODEXA Light", desc: "Lightweight, cost-effective", badge: null, tokens: "2K context" },
+                    {
+                      name: "CODEXA Pro",
+                      desc: "Most capable, best for complex tasks",
+                      badge: "Recommended",
+                      tokens: "8K context",
+                    },
+                    {
+                      name: "CODEXA Fast",
+                      desc: "Optimized for speed",
+                      badge: null,
+                      tokens: "4K context",
+                    },
+                    {
+                      name: "CODEXA Light",
+                      desc: "Lightweight, cost-effective",
+                      badge: null,
+                      tokens: "2K context",
+                    },
                   ].map((model, index) => (
                     <button
                       key={index}
@@ -705,15 +993,21 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                     >
                       <div className="text-left">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-foreground">{model.name}</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {model.name}
+                          </span>
                           {model.badge && (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary">
                               {model.badge}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">{model.desc}</p>
-                        <p className="text-xs text-muted-foreground/70 mt-0.5">{model.tokens}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {model.desc}
+                        </p>
+                        <p className="text-xs text-muted-foreground/70 mt-0.5">
+                          {model.tokens}
+                        </p>
                       </div>
                       <div
                         className={cn(
@@ -736,7 +1030,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
               {/* Response Style */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-foreground">Response Style</h4>
+                <h4 className="text-sm font-medium text-foreground">
+                  Response Style
+                </h4>
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { name: "Concise", desc: "Brief, to the point" },
@@ -762,50 +1058,68 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
 
               {/* Additional AI Settings */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-foreground">Additional Options</h4>
+                <h4 className="text-sm font-medium text-foreground">
+                  Additional Options
+                </h4>
                 <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Code Formatting</p>
+                    <p className="text-sm font-medium text-foreground">
+                      Code Formatting
+                    </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Automatically format code in responses
                     </p>
                   </div>
-                  <Toggle 
-                    enabled={codeFormatting} 
+                  <Toggle
+                    enabled={codeFormatting}
                     onToggle={() => {
                       setCodeFormatting(!codeFormatting);
-                      toast.success(codeFormatting ? "Code formatting disabled" : "Code formatting enabled");
-                    }} 
+                      toast.success(
+                        codeFormatting
+                          ? "Code formatting disabled"
+                          : "Code formatting enabled"
+                      );
+                    }}
                   />
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Streaming Responses</p>
+                    <p className="text-sm font-medium text-foreground">
+                      Streaming Responses
+                    </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Show responses as they are generated
                     </p>
                   </div>
-                  <Toggle 
-                    enabled={streamingEnabled} 
+                  <Toggle
+                    enabled={streamingEnabled}
                     onToggle={() => {
                       setStreamingEnabled(!streamingEnabled);
-                      toast.success(streamingEnabled ? "Streaming disabled" : "Streaming enabled");
-                    }} 
+                      toast.success(
+                        streamingEnabled
+                          ? "Streaming disabled"
+                          : "Streaming enabled"
+                      );
+                    }}
                   />
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Auto-save Conversations</p>
+                    <p className="text-sm font-medium text-foreground">
+                      Auto-save Conversations
+                    </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Automatically save chat history
                     </p>
                   </div>
-                  <Toggle 
-                    enabled={autoSave} 
+                  <Toggle
+                    enabled={autoSave}
                     onToggle={() => {
                       setAutoSave(!autoSave);
-                      toast.success(autoSave ? "Auto-save disabled" : "Auto-save enabled");
-                    }} 
+                      toast.success(
+                        autoSave ? "Auto-save disabled" : "Auto-save enabled"
+                      );
+                    }}
                   />
                 </div>
               </div>
@@ -816,7 +1130,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
           {activeTab === "notifications" && (
             <div className="space-y-8 animate-fade-in-up">
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Notifications</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Notifications
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Manage your notification preferences.
                 </p>
@@ -825,51 +1141,69 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
               {/* Notifications Toggle */}
               <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                 <div>
-                  <h4 className="text-sm font-medium text-foreground">Push Notifications</h4>
+                  <h4 className="text-sm font-medium text-foreground">
+                    Push Notifications
+                  </h4>
                   <p className="text-xs text-muted-foreground mt-1">
                     Receive notifications for important updates
                   </p>
                 </div>
-                <Toggle 
-                  enabled={notificationsEnabled} 
+                <Toggle
+                  enabled={notificationsEnabled}
                   onToggle={() => {
                     setNotificationsEnabled(!notificationsEnabled);
-                    toast.success(notificationsEnabled ? "Notifications disabled" : "Notifications enabled");
-                  }} 
+                    toast.success(
+                      notificationsEnabled
+                        ? "Notifications disabled"
+                        : "Notifications enabled"
+                    );
+                  }}
                 />
               </div>
 
               {/* Sound Toggle */}
               <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                 <div>
-                  <h4 className="text-sm font-medium text-foreground">Sound Effects</h4>
+                  <h4 className="text-sm font-medium text-foreground">
+                    Sound Effects
+                  </h4>
                   <p className="text-xs text-muted-foreground mt-1">
                     Play sounds for notifications and actions
                   </p>
                 </div>
-                <Toggle 
-                  enabled={soundEnabled} 
+                <Toggle
+                  enabled={soundEnabled}
                   onToggle={() => {
                     setSoundEnabled(!soundEnabled);
-                    toast.success(soundEnabled ? "Sound effects disabled" : "Sound effects enabled");
-                  }} 
+                    toast.success(
+                      soundEnabled
+                        ? "Sound effects disabled"
+                        : "Sound effects enabled"
+                    );
+                  }}
                 />
               </div>
 
               {/* Email Notifications */}
               <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20">
                 <div>
-                  <h4 className="text-sm font-medium text-foreground">Email Notifications</h4>
+                  <h4 className="text-sm font-medium text-foreground">
+                    Email Notifications
+                  </h4>
                   <p className="text-xs text-muted-foreground mt-1">
                     Receive important updates via email
                   </p>
                 </div>
-                <Toggle 
-                  enabled={emailNotifications} 
+                <Toggle
+                  enabled={emailNotifications}
                   onToggle={() => {
                     setEmailNotifications(!emailNotifications);
-                    toast.success(emailNotifications ? "Email notifications disabled" : "Email notifications enabled");
-                  }} 
+                    toast.success(
+                      emailNotifications
+                        ? "Email notifications disabled"
+                        : "Email notifications enabled"
+                    );
+                  }}
                 />
               </div>
             </div>
@@ -879,7 +1213,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
           {activeTab === "privacy" && (
             <div className="space-y-8 animate-fade-in-up">
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Privacy & Security</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Privacy & Security
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Manage your privacy settings and security options.
                 </p>
@@ -892,18 +1228,22 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                     <Smartphone className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-foreground">Two-Factor Authentication</h4>
+                    <h4 className="text-sm font-medium text-foreground">
+                      Two-Factor Authentication
+                    </h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       Add an extra layer of security to your account
                     </p>
                   </div>
                 </div>
-                <Toggle 
-                  enabled={twoFactorEnabled} 
+                <Toggle
+                  enabled={twoFactorEnabled}
                   onToggle={() => {
                     setTwoFactorEnabled(!twoFactorEnabled);
-                    toast.success(twoFactorEnabled ? "2FA disabled" : "2FA enabled");
-                  }} 
+                    toast.success(
+                      twoFactorEnabled ? "2FA disabled" : "2FA enabled"
+                    );
+                  }}
                 />
               </div>
 
@@ -914,24 +1254,32 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                     <History className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-foreground">Data Collection</h4>
+                    <h4 className="text-sm font-medium text-foreground">
+                      Data Collection
+                    </h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       Allow anonymous usage data to improve the service
                     </p>
                   </div>
                 </div>
-                <Toggle 
-                  enabled={dataCollection} 
+                <Toggle
+                  enabled={dataCollection}
                   onToggle={() => {
                     setDataCollection(!dataCollection);
-                    toast.success(dataCollection ? "Data collection disabled" : "Data collection enabled");
-                  }} 
+                    toast.success(
+                      dataCollection
+                        ? "Data collection disabled"
+                        : "Data collection enabled"
+                    );
+                  }}
                 />
               </div>
 
               {/* Session Management */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-foreground">Active Sessions</h4>
+                <h4 className="text-sm font-medium text-foreground">
+                  Active Sessions
+                </h4>
                 <div className="p-4 rounded-xl border border-border/50 bg-secondary/20 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -939,14 +1287,20 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                         <Monitor className="w-4 h-4 text-muted-foreground" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">MacBook Pro - Chrome</p>
-                        <p className="text-xs text-muted-foreground">Current session</p>
+                        <p className="text-sm font-medium text-foreground">
+                          MacBook Pro - Chrome
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Current session
+                        </p>
                       </div>
                     </div>
                     <span className="text-xs text-emerald-500">Active</span>
                   </div>
                   <button
-                    onClick={() => toast.success("All other sessions have been logged out")}
+                    onClick={() =>
+                      toast.success("All other sessions have been logged out")
+                    }
                     className="w-full px-4 py-2 rounded-lg border border-destructive/30 text-destructive text-sm font-medium hover:bg-destructive/10 transition-colors"
                   >
                     Log out of all other sessions
@@ -962,14 +1316,20 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                       <Download className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-foreground">Download Your Data</h4>
+                      <h4 className="text-sm font-medium text-foreground">
+                        Download Your Data
+                      </h4>
                       <p className="text-xs text-muted-foreground mt-1">
                         Get a copy of all your data
                       </p>
                     </div>
                   </div>
                   <button
-                    onClick={() => toast.success("Data export started. You'll receive an email when ready.")}
+                    onClick={() =>
+                      toast.success(
+                        "Data export started. You'll receive an email when ready."
+                      )
+                    }
                     className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                   >
                     Export
@@ -983,7 +1343,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
           {activeTab === "shortcuts" && (
             <div className="space-y-8 animate-fade-in-up">
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Keyboard Shortcuts</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Keyboard Shortcuts
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Quick keyboard shortcuts to navigate the app efficiently.
                 </p>
@@ -995,7 +1357,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                     key={index}
                     className="flex items-center justify-between p-4 rounded-xl border border-border/50 bg-secondary/20"
                   >
-                    <span className="text-sm font-medium text-foreground">{shortcut.action}</span>
+                    <span className="text-sm font-medium text-foreground">
+                      {shortcut.action}
+                    </span>
                     <div className="flex items-center gap-1">
                       {shortcut.keys.map((key, keyIndex) => (
                         <kbd
@@ -1016,7 +1380,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
           {activeTab === "language" && (
             <div className="space-y-8 animate-fade-in-up">
               <div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Language</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Language
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Choose your preferred language for the interface.
                 </p>
@@ -1039,7 +1405,9 @@ export function SettingsPanel({ isOpen, onClose, isDark, onThemeChange }: Settin
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{lang.flag}</span>
-                      <span className="text-sm font-medium text-foreground">{lang.name}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {lang.name}
+                      </span>
                     </div>
                     <div
                       className={cn(

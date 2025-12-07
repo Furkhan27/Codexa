@@ -97,11 +97,12 @@ def get_chat_messages(chat_id: str):
 
 
 # ---------- PROJECTS ----------
-def save_project(user_id: str, title: str, description: str, chat_id:str,code: str=None,code_language:dict = None):
+def save_project(user_id: str, title: str, description: str, chat_id:str,code: str=None,plan:dict=None, code_language:str = None):
     project = {
         "user_id": user_id,
         "title": title,
         "description": description,
+        "plan":plan,
         "code": code,
         "code_language":code_language,
         "chat_id":chat_id,
@@ -110,4 +111,5 @@ def save_project(user_id: str, title: str, description: str, chat_id:str,code: s
     }
 
     res = projects_col.insert_one(project)
+    print("Saved project with ID:", str(res.inserted_id))
     return str(res.inserted_id)

@@ -6,7 +6,8 @@ from agents.ProjectPipeline import ProjectPipeline
 from utils.database_models import (
     create_chat,
     save_message,
-    get_chat_messages
+    get_chat_messages,
+    save_project
 )
 from utils.database_models import get_chat_messages
 from utils.ai_client import gemini as client
@@ -89,6 +90,16 @@ def chat(payload: ChatPayload):
             agent="pipeline"
         )
 
+        save_project(
+            user_id=user_id,
+            plan = pipeline_result["plan"],
+            title=pipeline_result["title"],
+            description=user_message,
+            chat_id=chat_id,
+            code=pipeline_result["code"],
+            code_language="html"
+        )
+        
         return {
             "ok": True,
             "type": "project",

@@ -8,7 +8,7 @@ env/
 venv/
 .venv/
 
-# dotenv
+dotenv
 .env
 .env.local
 
