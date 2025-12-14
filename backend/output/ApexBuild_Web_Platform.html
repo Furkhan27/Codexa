@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexBuild Construction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50; /* Dark Blue */
+            --secondary-color: #e67e22; /* Orange */
+            --accent-color: #f39c12; /* Gold/Yellow */
+            --text-color: #333;
+            --light-text-color: #ecf0f1; /* Light Grey */
+            --bg-light: #f4f7f6;
+            --bg-dark: #34495e;
+            --border-radius: 5px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-light);
+            scroll-behavior: smooth;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: color var(--transition-speed) ease;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--light-text-color);
+        }
+
+        .logo span {
+            color: var(--secondary-color);
+        }
+
+        nav ul {
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 25px;
+        }
+
+        nav ul li a {
+            color: var(--light-text-color);
+            font-weight: 500;
+            font-size: 1.05rem;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: width var(--transition-speed) ease;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background-color: var(--light-text-color);
+            margin-bottom: 4px;
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
+        #hero {
+            background: url('https://images.unsplash.com/photo-1517036014160-589578278211?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+            color: var(--light-text-color);
+            text-align: center;
+            padding: 150px 0;
+            position: relative;
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        #hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        #hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        #hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: var(--light-text-color);
+            padding: 15px 30px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: background-color var(--transition-speed) ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        /* Sections General */
+        section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        section:nth-of-type(even) {
+            background-color: var(--bg-light);
+        }
+
+        section:nth-of-type(odd) {
+            background-color: #fff;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -10px;
+            width: 60px;
+            height: 4px;
+            background-color: var(--secondary-color);
+            border-radius: 2px;
+        }
+
+        section p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+        }
+
+        /* About Section */
+        #about .content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        #about .text-content {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+        }
+
+        #about .text-content h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        #about .text-content p {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            max-width: none;
+        }
+
+        #about .image-content {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        #about .image-content img {
+            width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Services Section */
+        #services .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .service-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-card .icon {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .service-card p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 0;
+            max-width: none;
+        }
+
+        /* Projects Section */
+        #projects {
+            background-color: var(--bg-dark);
+            color: var(--light-text-color);
+        }
+
+        #projects h2 {
+            color: var(--light-text-color);
+        }
+
+        #projects h2::after {
+            background-color: var(--secondary-color);
+        }
+
+        #projects p {
+            color: var(--light-text-color);
+        }
+
+        #projects .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .project-card .info {
+            padding: 20px;
+            text-align: left;
+        }
+
+        .project-card h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .project-card p {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 0;
+            max-width: none;
+        }
+
+        /* Testimonials Section */
+        #testimonials .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .testimonial-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: left;
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '“';
+            font-family: serif;
+            font-size: 4rem;
+            color: var(--secondary-color);
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            opacity: 0.2;
+            line-height: 1;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            max-width: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-card .client-info {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .testimonial-card .client-info span {
+            font-weight: 400;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section */
+        #contact {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+        }
+
+        #contact h2 {
+            color: var(--light-text-color);
+        }
+
+        #contact h2::after {
+            background-color: var(--secondary-color);
+        }
+
+        #contact p {
+            color: var(--light-text-color);
+        }
+
+        #contact .contact-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 40px;
+        }
+
+        #contact .contact-form,
+        #contact .contact-info {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        #contact .contact-form h3,
+        #contact .contact-info h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--light-text-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+            color: var(--text-color);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+        }
+
+        #contact .contact-info p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            color: var(--light-text-color);
+            max-width: none;
+        }
+
+        #contact .contact-info p i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: var(--secondary-color);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-dark);
+            color: var(--light-text-color);
+            padding: 40px 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        footer .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        footer .footer-col {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 30px;
+        }
+
+        footer .footer-col:last-child {
+            text-align: right;
+        }
+
+        footer .footer-col h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        footer .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        footer .footer-col ul li a {
+            color: var(--light-text-color);
+            font-weight: 300;
+        }
+
+        footer .footer-col ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        footer .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: var(--secondary-color);
+            color: var(--light-text-color);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 10px;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        footer .social-links a:hover {
+            background-color: var(--accent-color);
+        }
+
+        footer .copyright {
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Utility classes for icons (Font Awesome simulation) */
+        .icon-building::before { content: "🏗️"; }
+        .icon-house::before { content: "🏠"; }
+        .icon-city::before { content: "🏢"; }
+        .icon-wrench::before { content: "🛠️"; }
+        .icon-road::before { content: "🛣️"; }
+        .icon-chart::before { content: "📈"; }
+        .icon-users::before { content: "👥"; }
+        .icon-phone::before { content: "📞"; }
+        .icon-envelope::before { content: "✉️"; }
+        .icon-map-marker::before { content: "📍"; }
+        .icon-facebook::before { content: "📘"; }
+        .icon-twitter::before { content: "🐦"; }
+        .icon-linkedin::before { content: "🔗"; }
+        .icon-instagram::before { content: "📸"; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: var(--primary-color);
+                position: absolute;
+                top: 70px; /* Adjust based on header height */
+                left: 0;
+                padding: 20px 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            nav ul.active {
+                display: flex;
+            }
+
+            nav ul li {
+                margin: 10px 0;
+                text-align: center;
+            }
+
+            nav ul li a {
+                padding: 10px 0;
+                display: block;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            #hero h1 {
+                font-size: 2.5rem;
+            }
+
+            #hero p {
+                font-size: 1.1rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 60px 0;
+            }
+
+            #about .content {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #about .text-content,
+            #about .image-content {
+                max-width: 100%;
+            }
+
+            #services .service-grid,
+            #projects .project-grid,
+            #testimonials .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #contact .contact-content {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #contact .contact-form,
+            #contact .contact-info {
+                max-width: 100%;
+            }
+
+            footer .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            footer .footer-col {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            footer .footer-col:last-child {
+                text-align: center;
+            }
+
+            footer .social-links {
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            #hero h1 {
+                font-size: 2rem;
+            }
+
+            #hero p {
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .service-card h3,
+            .project-card h3,
+            .testimonial-card .client-info {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="#" class="logo">Apex<span>Build</span></a>
+            <nav>
+                <ul id="nav-links">
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="hamburger" id="hamburger-menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container">
+                <h1>Building Excellence, One Project at a Time.</h1>
+                <p>Your trusted partner for innovative and sustainable construction solutions.</p>
+                <a href="#services" class="btn">Explore Our Services</a>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <h2>About ApexBuild</h2>
+                <p>With years of experience and a commitment to quality, ApexBuild delivers exceptional construction services tailored to your needs.</p>
+                <div class="content">
+                    <div class="text-content">
+                        <h3>Our Mission</h3>
+                        <p>To be the leading construction company, recognized for our unwavering commitment to quality, safety, and client satisfaction. We strive to build lasting relationships through superior craftsmanship and ethical practices.</p>
+                        <h3>Our Values</h3>
+                        <p><strong>Integrity:</strong> We operate with honesty and transparency in all our dealings.<br>
+                        <strong>Quality:</strong> We deliver projects that meet the highest standards of excellence.<br>
+                        <strong>Safety:</strong> The well-being of our team and clients is our top priority.<br>
+                        <strong>Innovation:</strong> We embrace new technologies and methods to provide efficient solutions.</p>
+                    </div>
+                    <div class="image-content">
+                        <img src="https://images.unsplash.com/photo-1581092490439-01449b78996b?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Construction team discussing plans">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <div class="container">
+                <h2>Our Services</h2>
+                <p>From residential homes to large-scale commercial complexes, we offer a comprehensive range of construction services.</p>
+                <div class="service-grid">
+                    <div class="service-card">
+                        <div class="icon icon-house"></div>
+                        <h3>Residential Construction</h3>
+                        <p>Building dream homes with precision, quality, and attention to every detail, ensuring client satisfaction.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon icon-city"></div>
+                        <h3>Commercial Projects</h3>
+                        <p>Delivering robust and functional commercial spaces, including offices, retail, and industrial facilities.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon icon-wrench"></div>
+                        <h3>Renovation & Remodeling</h3>
+                        <p>Transforming existing structures with modern designs and efficient solutions, enhancing value and aesthetics.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon icon-road"></div>
+                        <h3>Infrastructure Development</h3>
+                        <p>Expertise in developing essential infrastructure, from roads to utilities, supporting community growth.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon icon-chart"></div>
+                        <h3>Project Management</h3>
+                        <p>Overseeing projects from conception to completion, ensuring timely delivery and budget adherence.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="icon icon-users"></div>
+                        <h3>Consulting Services</h3>
+                        <p>Providing expert advice and guidance on construction planning, feasibility, and regulatory compliance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="container">
+                <h2>Our Portfolio</h2>
+                <p>Explore some of our recently completed projects that showcase our diverse capabilities and commitment to excellence.</p>
+                <div class="project-grid">
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1541888946-dce9e082b59e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Modern Office Building">
+                        <div class="info">
+                            <h3>Modern Office Complex</h3>
+                            <p>A state-of-the-art commercial building designed for efficiency and sustainability.</p>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1560518883-ffcd187172a1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Luxury Residential Villa">
+                        <div class="info">
+                            <h3>Luxury Residential Villa</h3>
+                            <p>Custom-built luxury home with bespoke finishes and smart home integration.</p>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1533134486753-c833a0879875?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Urban Infrastructure Project">
+                        <div class="info">
+                            <h3>Urban Infrastructure Upgrade</h3>
+                            <p>Major city road and utility network upgrade, improving urban connectivity.</p>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="https://images.unsplash.com/photo-1542362567-b07e54358753?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Retail Store Renovation">
+                        <div class="info">
+                            <h3>Retail Store Renovation</h3>
+                            <p>Complete interior and exterior renovation of a prominent retail outlet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials">
+            <div class="container">
+                <h2>What Our Clients Say</h2>
+                <p>Hear directly from those who have experienced the ApexBuild difference.</p>
+                <div class="testimonial-grid">
+                    <div class="testimonial-card">
+                        <p>"ApexBuild exceeded our expectations on our new office complex. Their professionalism, attention to detail, and commitment to deadlines were truly impressive. Highly recommended!"</p>
+                        <div class="client-info">John Doe <span>- CEO, Tech Solutions Inc.</span></div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"We entrusted ApexBuild with our home renovation, and they delivered a stunning transformation. The team was courteous, skilled, and kept us informed every step of the way."</p>
+                        <div class="client-info">Jane Smith <span>- Homeowner</span></div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"The infrastructure project was complex, but ApexBuild managed it flawlessly. Their engineering expertise and project management skills ensured a successful and timely completion."</p>
+                        <div class="client-info">Robert Johnson <span>- City Planning Director</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container">
+                <h2>Get in Touch</h2>
+                <p>Have a project in mind or need a consultation? Contact us today, and let's build something great together.</p>
+                <div class="contact-content">
+                    <div class="contact-form">
+                        <h3>Send Us a Message</h3>
+                        <form id="contactForm">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone (Optional)</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">Send Message</button>
+                        </form>
+                    </div>
+                    <div class="contact-info">
+                        <h3>Our Contact Details</h3>
+                        <p><i class="icon-map-marker"></i> 123 Construction Way, Buildville, BC 12345</p>
+                        <p><i class="icon-phone"></i> +1 (555) 123-4567</p>
+                        <p><i class="icon-envelope"></i> info@apexbuild.com</p>
+                        <p><i class="icon-building"></i> Mon - Fri: 8:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-col">
+                <h4>ApexBuild</h4>
+                <p>Building a stronger future, one project at a time. Dedicated to quality, safety, and client satisfaction.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="icon-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="icon-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="icon-linkedin"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="icon-instagram"></i></a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 ApexBuild Construction. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.getElementById('hamburger-menu');
+            const navLinks = document.getElementById('nav-links');
+            const contactForm = document.getElementById('contactForm');
+
+            // Mobile Navigation Toggle
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Smooth Scrolling for Navigation Links
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - document.querySelector('header').offsetHeight,
+                            behavior: 'smooth'
+                        });
+                        // Close mobile nav after clicking a link
+                        if (navLinks.classList.contains('active')) {
+                            navLinks.classList.remove('active');
+                        }
+                    }
+                });
+            });
+
+            // Contact Form Submission (Client-side only)
+            contactForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent actual form submission
+
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const message = document.getElementById('message').value.trim();
+
+                if (name === '' || email === '' || message === '') {
+                    alert('Please fill in all required fields (Name, Email, Message).');
+                    return;
+                }
+
+                if (!validateEmail(email)) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+
+                // Simulate form submission success
+                alert('Thank you for your message, ' + name + '! We will get back to you shortly.');
+                contactForm.reset(); // Clear the form
+            });
+
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(String(email).toLowerCase());
+            }
+        });
+    </script>
+</body>
+</html>

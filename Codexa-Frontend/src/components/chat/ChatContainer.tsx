@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import { PreviewPanel } from "../layout/PreviewPanel";
-import { CodePanel } from "../layout/CodePanel";
 import { useParams, useNavigate } from "react-router-dom";
 
 interface Message {

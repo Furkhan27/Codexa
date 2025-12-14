@@ -113,3 +113,15 @@ def save_project(user_id: str, title: str, description: str, chat_id:str,code: s
     res = projects_col.insert_one(project)
     print("Saved project with ID:", str(res.inserted_id))
     return str(res.inserted_id)
+
+
+
+def get_user_projects(user_id: str):
+    cursor = projects_col.find({"user_id": user_id}).sort("created_at", -1)
+
+    projects = []
+    for p in cursor:
+        p["_id"] = str(p["_id"])
+        projects.append(p)
+
+    return projects

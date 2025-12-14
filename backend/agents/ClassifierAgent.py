@@ -43,9 +43,10 @@ User message: "{message}"
 
         try:
             response = gemini.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash",
                 contents=prompt
             )
+            print("Classifier response:", response.text.strip())
         except Exception as e:
             print("❌ Classifier error:", e)
             return {

@@ -66,6 +66,20 @@ export function DashboardLayout() {
     }
   };
 
+  const openProjectInPanels = (
+  code: string,
+  language: string,
+  html: string
+) => {
+  setGeneratedCode(code);
+  setGeneratedLanguage(language);
+  setGeneratedHTML(html);
+
+  setSplitOpen(false);
+  setPreviewOpen(true);
+  setCodeOpen(true);
+};
+
   const handlePreviewToggle = () => {
     if (splitOpen) setSplitOpen(false);
     setPreviewOpen(!previewOpen);
@@ -98,6 +112,7 @@ export function DashboardLayout() {
       <TopBar
         onSettingsClick={() => setSettingsOpen(true)}
         previewOpen={previewOpen}
+        onOpenProject={openProjectInPanels}   
         codeOpen={codeOpen}
         splitOpen={splitOpen}
         onPreviewToggle={handlePreviewToggle}

@@ -33,7 +33,7 @@ def get_title_from_message(message: str):
     """
 
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=prompt
     )
 
@@ -61,7 +61,7 @@ def chat(payload: ChatPayload):
     user_message = payload.message.strip()
     user_id = payload.user_id
     chat_id = payload.chat_id
-    print("Received chat payload:", payload)
+    # print("Received chat payload:", payload)
     # ---------- Create new project if none exists ----------
     if not chat_id:
         chat_id = create_chat(
@@ -75,6 +75,7 @@ def chat(payload: ChatPayload):
 
     # ---------- Classify Intent ----------
     intent = classifier.classify_for_project(user_message, chat_id)
+    print("Classified Intent:", intent)
     # ---------- PROJECT PIPELINE ----------
     if intent["type"] == "project":
         

@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { 
-  ChevronDown, 
-  Search, 
-  Sparkles, 
-  Code, 
-  Eye, 
+import {
+  ChevronDown,
+  Search,
+  Sparkles,
+  Code,
+  Eye,
   Columns,
   Plus,
   Command,
@@ -18,22 +18,31 @@ import {
   CreditCard,
   HelpCircle,
   Crown,
-  Activity
+  Activity,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 
 interface Project {
   id: string;
-  name: string;
-  emoji: string;
+  title: string;
+  chat_id: string;
+  code: string;
+  code_language: string;
+  emoji?: string;
   status: "active" | "paused" | "building";
 }
 
-const projects: Project[] = [
-  { id: "1", name: "AI Dashboard", emoji: "🚀", status: "active" },
-  { id: "2", name: "E-commerce App", emoji: "🛒", status: "building" },
-  { id: "3", name: "Portfolio Site", emoji: "✨", status: "paused" },
+let projects: Project[] = [
+  {
+    id: "",
+    title: "Recent Projects",
+    chat_id: "",
+    code: "",
+    code_language: "",
+    emoji: "",
+    status: "active",
+  },
 ];
 
 interface TopBarProps {
@@ -44,28 +53,51 @@ interface TopBarProps {
   onPreviewToggle: () => void;
   onCodeToggle: () => void;
   onSplitToggle: () => void;
+  onOpenProject: (code: string, language: string, html: string) => void;
   isDark: boolean;
   onThemeToggle: () => void;
 }
 
-export function TopBar({ 
-  onSettingsClick, 
-  previewOpen, 
-  codeOpen, 
+export function TopBar({
+  onSettingsClick,
+  previewOpen,
+  onOpenProject,
+  codeOpen,
   splitOpen,
-  onPreviewToggle, 
+  onPreviewToggle,
   onCodeToggle,
   onSplitToggle,
   isDark,
-  onThemeToggle
+  onThemeToggle,
 }: TopBarProps) {
   const [activeProject, setActiveProject] = useState(projects[0]);
   const [showProjectMenu, setShowProjectMenu] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const {user} = useAuth()
+  const { user, userId } = useAuth();
+
   console.log(user);
-  
+
+  useEffect(() => {
+    const getProjects = async () => {
+      try {
+        let res = await fetch(`http://localhost:8000/projects/${userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        let data = await res.json();
+        projects = data.projects;
+        console.log(projects);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getProjects();
+  }, [userId]);
+
   const handleNewProject = () => {
     toast.success("Creating new project...", {
       description: "Your new project is being set up",
@@ -75,9 +107,12 @@ export function TopBar({
 
   const getStatusColor = (status: Project["status"]) => {
     switch (status) {
-      case "active": return "bg-emerald-500";
-      case "building": return "bg-amber-500 animate-pulse";
-      case "paused": return "bg-muted-foreground";
+      case "active":
+        return "bg-emerald-500";
+      case "building":
+        return "bg-amber-500 animate-pulse";
+      case "paused":
+        return "bg-muted-foreground";
     }
   };
 
@@ -85,7 +120,7 @@ export function TopBar({
     <header className="h-16 border-b border-border/40 bg-card/50 backdrop-blur-xl flex items-center justify-between px-4 z-50 relative">
       {/* Gradient line at bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-      
+
       {/* Left section - Logo and Project Selector */}
       <div className="flex items-center gap-5">
         {/* Logo */}
@@ -97,10 +132,14 @@ export function TopBar({
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-background animate-pulse" />
           </div>
           <div className="hidden sm:flex flex-col">
-            <span className="font-bold text-lg text-foreground leading-tight tracking-tight">CODEXA</span>
+            <span className="font-bold text-lg text-foreground leading-tight tracking-tight">
+              CODEXA
+            </span>
             <div className="flex items-center gap-1">
               <Crown className="w-3 h-3 text-amber-500" />
-              <span className="text-[10px] text-amber-500 font-medium">Pro</span>
+              <span className="text-[10px] text-amber-500 font-medium">
+                Pro
+              </span>
             </div>
           </div>
         </div>
@@ -114,43 +153,56 @@ export function TopBar({
             onClick={() => setShowProjectMenu(!showProjectMenu)}
             className={cn(
               "flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 group",
-              showProjectMenu 
-                ? "bg-secondary ring-2 ring-primary/20" 
+              showProjectMenu
+                ? "bg-secondary ring-2 ring-primary/20"
                 : "hover:bg-secondary/70"
             )}
           >
             <div className="relative">
-              <span className="text-xl">{activeProject.emoji}</span>
-              <div className={cn(
-                "absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-background",
-                getStatusColor(activeProject.status)
-              )} />
+              <span className="text-xl">✨</span>
+              <div
+                className={cn(
+                  "absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-background",
+                  getStatusColor("active")
+                )}
+              />
             </div>
             <div className="flex flex-col items-start">
               <span className="text-sm font-semibold text-foreground leading-tight">
-                {activeProject.name}
+                {activeProject.title}
               </span>
-              <span className="text-[10px] text-muted-foreground capitalize">{activeProject.status}</span>
+              <span className="text-[10px] text-muted-foreground capitalize">
+                {"active"}
+              </span>
             </div>
-            <ChevronDown className={cn(
-              "w-4 h-4 text-muted-foreground transition-transform duration-300",
-              showProjectMenu && "rotate-180"
-            )} />
+            <ChevronDown
+              className={cn(
+                "w-4 h-4 text-muted-foreground transition-transform duration-300",
+                showProjectMenu && "rotate-180"
+              )}
+            />
           </button>
 
           {showProjectMenu && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowProjectMenu(false)} />
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowProjectMenu(false)}
+              />
               <div className="absolute top-full mt-2 left-0 w-72 z-50 animate-fade-in-scale">
                 <div className="bg-card border border-border rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
                   {/* Header */}
                   <div className="px-4 py-3 border-b border-border/50 bg-secondary/30">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Your Projects</span>
-                      <span className="text-xs text-muted-foreground">{projects.length} total</span>
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Your Projects
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {projects.length} total
+                      </span>
                     </div>
                   </div>
-                  
+
                   {/* Projects List */}
                   <div className="p-2">
                     {projects.map((project) => (
@@ -159,30 +211,43 @@ export function TopBar({
                         onClick={() => {
                           setActiveProject(project);
                           setShowProjectMenu(false);
-                          toast.info(`Switched to ${project.name}`);
+                          onOpenProject(
+                            project.code,
+                            project.code_language,
+                            project.code_language === "html" ? project.code : ""
+                          );
+                          toast.info(`Switched to ${project.title}`);
                         }}
                         className={cn(
                           "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group",
-                          activeProject.id === project.id 
-                            ? "bg-primary/10 ring-1 ring-primary/30" 
+                          activeProject.id === project.id
+                            ? "bg-primary/10 ring-1 ring-primary/30"
                             : "hover:bg-secondary/80"
                         )}
                       >
                         <div className="relative">
-                          <span className="text-2xl">{project.emoji}</span>
-                          <div className={cn(
-                            "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-card",
-                            getStatusColor(project.status)
-                          )} />
+                          <span className="text-2xl">✨</span>
+                          <div
+                            className={cn(
+                              "absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-card",
+                              getStatusColor("active")
+                            )}
+                          />
                         </div>
                         <div className="flex-1 text-left">
-                          <div className={cn(
-                            "text-sm font-medium",
-                            activeProject.id === project.id ? "text-primary" : "text-foreground"
-                          )}>
-                            {project.name}
+                          <div
+                            className={cn(
+                              "text-sm font-medium",
+                              activeProject.id === project.id
+                                ? "text-primary"
+                                : "text-foreground"
+                            )}
+                          >
+                            {project.title}
                           </div>
-                          <div className="text-xs text-muted-foreground capitalize">{project.status}</div>
+                          <div className="text-xs text-muted-foreground capitalize">
+                            {project.status}
+                          </div>
                         </div>
                         {activeProject.id === project.id && (
                           <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -190,10 +255,10 @@ export function TopBar({
                       </button>
                     ))}
                   </div>
-                  
+
                   {/* Footer */}
                   <div className="p-2 border-t border-border/50">
-                    <button 
+                    <button
                       onClick={handleNewProject}
                       className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-xl transition-all duration-200"
                     >
@@ -212,9 +277,28 @@ export function TopBar({
       <div className="hidden md:flex items-center">
         <div className="flex items-center gap-1 p-1.5 rounded-2xl bg-secondary/50 border border-border/50">
           {[
-            { id: "preview", label: "Preview", icon: Eye, isActive: previewOpen && !splitOpen, onClick: onPreviewToggle },
-            { id: "code", label: "Code", icon: Code, isActive: codeOpen && !splitOpen, onClick: onCodeToggle },
-            { id: "split", label: "Split", icon: Columns, isActive: splitOpen, onClick: onSplitToggle, accent: true },
+            {
+              id: "preview",
+              label: "Preview",
+              icon: Eye,
+              isActive: previewOpen && !splitOpen,
+              onClick: onPreviewToggle,
+            },
+            {
+              id: "code",
+              label: "Code",
+              icon: Code,
+              isActive: codeOpen && !splitOpen,
+              onClick: onCodeToggle,
+            },
+            {
+              id: "split",
+              label: "Split",
+              icon: Columns,
+              isActive: splitOpen,
+              onClick: onSplitToggle,
+              accent: true,
+            },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -222,7 +306,7 @@ export function TopBar({
               className={cn(
                 "relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
                 tab.isActive
-                  ? tab.accent 
+                  ? tab.accent
                     ? "bg-gradient-to-r from-accent to-primary text-white shadow-lg shadow-primary/20"
                     : "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/20"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/80"
@@ -241,12 +325,14 @@ export function TopBar({
       {/* Right section - Search & Actions */}
       <div className="flex items-center gap-2">
         {/* Search */}
-        <div className={cn(
-          "hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl border transition-all duration-300",
-          searchFocused 
-            ? "bg-secondary border-primary/30 ring-2 ring-primary/10 w-64" 
-            : "bg-secondary/40 border-border/40 hover:bg-secondary/60 w-48"
-        )}>
+        <div
+          className={cn(
+            "hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl border transition-all duration-300",
+            searchFocused
+              ? "bg-secondary border-primary/30 ring-2 ring-primary/10 w-64"
+              : "bg-secondary/40 border-border/40 hover:bg-secondary/60 w-48"
+          )}
+        >
           <Search className="w-4 h-4 text-muted-foreground" />
           <input
             type="text"
@@ -265,7 +351,7 @@ export function TopBar({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-1">
-          <button 
+          <button
             onClick={onThemeToggle}
             className="relative p-2.5 rounded-xl hover:bg-secondary/80 transition-all duration-200 text-muted-foreground hover:text-foreground group"
             title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -276,8 +362,8 @@ export function TopBar({
               <Moon className="w-5 h-5 group-hover:scale-110 transition-transform text-primary" />
             )}
           </button>
-          
-          <button 
+
+          <button
             className="relative p-2.5 rounded-xl hover:bg-secondary/80 transition-all duration-200 text-muted-foreground hover:text-foreground group"
             title="Usage"
           >
@@ -291,7 +377,7 @@ export function TopBar({
 
         {/* User Avatar with Dropdown */}
         <div className="relative">
-          <button 
+          <button
             onClick={() => setShowUserMenu(!showUserMenu)}
             className={cn(
               "flex items-center gap-3 px-2 py-1.5 rounded-xl transition-all duration-200 group",
@@ -300,43 +386,64 @@ export function TopBar({
           >
             <div className="relative">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center text-xs font-bold text-white shadow-lg group-hover:shadow-purple-500/30 transition-all duration-300 group-hover:scale-105">
-                {user?.name ? user.name.charAt(0).toUpperCase() + user.name.charAt(1).toUpperCase() : "U"}
+                {user?.name
+                  ? user.name.charAt(0).toUpperCase() +
+                    user.name.charAt(1).toUpperCase()
+                  : "U"}
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-background" />
             </div>
             <div className="hidden xl:flex flex-col items-start">
-              <span className="text-sm font-medium text-foreground leading-tight">{user?.name ? user?.name : "User Name"}</span>
-              <span className="text-[10px] text-muted-foreground">Pro Plan</span>
+              <span className="text-sm font-medium text-foreground leading-tight">
+                {user?.name ? user?.name : "User Name"}
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                Pro Plan
+              </span>
             </div>
-            <ChevronDown className={cn(
-              "hidden xl:block w-4 h-4 text-muted-foreground transition-transform duration-300",
-              showUserMenu && "rotate-180"
-            )} />
+            <ChevronDown
+              className={cn(
+                "hidden xl:block w-4 h-4 text-muted-foreground transition-transform duration-300",
+                showUserMenu && "rotate-180"
+              )}
+            />
           </button>
 
           {/* User Dropdown Menu */}
           {showUserMenu && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowUserMenu(false)}
+              />
               <div className="absolute top-full mt-2 right-0 w-64 z-50 animate-fade-in-scale">
                 <div className="bg-card border border-border rounded-2xl shadow-2xl shadow-black/20 overflow-hidden">
                   {/* User Info Header */}
                   <div className="px-4 py-4 border-b border-border/50 bg-gradient-to-br from-secondary/50 to-secondary/20">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 flex items-center justify-center text-lg font-bold text-white shadow-lg">
-                        {user?.name ? user.name.charAt(0).toUpperCase() + user.name.charAt(1).toUpperCase() : "U"}
+                        {user?.name
+                          ? user.name.charAt(0).toUpperCase() +
+                            user.name.charAt(1).toUpperCase()
+                          : "U"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">{user.name ? user.name : "User Name"}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user.email? user.email : "john@example.com"}</p>
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {user.name ? user.name : "User Name"}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {user.email ? user.email : "john@example.com"}
+                        </p>
                         <div className="flex items-center gap-1 mt-1">
                           <Crown className="w-3 h-3 text-amber-500" />
-                          <span className="text-xs text-amber-500 font-medium">Pro Plan</span>
+                          <span className="text-xs text-amber-500 font-medium">
+                            Pro Plan
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Menu Items */}
                   <div className="p-2">
                     <button
@@ -380,7 +487,7 @@ export function TopBar({
                       <span>Help & Support</span>
                     </button>
                   </div>
-                  
+
                   {/* Logout */}
                   <div className="p-2 border-t border-border/50">
                     <button

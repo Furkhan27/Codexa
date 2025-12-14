@@ -34,7 +34,7 @@ class ChatAgent:
         print("Conversation so far:\n", conversation_text)
         # 5. Call Gemini
         resp = gemini.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=conversation_text
         )
 
