@@ -1,17 +1,19 @@
 from fastapi import APIRouter, HTTPException
 from models.schemas import ChatPayload
-from agents.ChatAgent import ChatAgent
-from agents.ClassifierAgent import ClassifierAgent
-from agents.ProjectPipeline import ProjectPipeline
-from utils.database_models import (
+from agents.chat_agent import ChatAgent
+from agents.classifier_agent import ClassifierAgent
+from agents.project_pipeline_agent import ProjectPipeline
+from utils.database_models_util import (
     create_chat,
     save_message,
+    get_user_chats,
     get_chat_messages,
     save_project
 )
-from utils.database_models import get_chat_messages
-from utils.ai_client import gemini as client
+from utils.ai_client_util import gemini as client
 import json
+from utils.file_utils import save_files   # NEW (flat file saver)
+
 
 router = APIRouter(prefix="/chat")
 
@@ -33,7 +35,7 @@ def get_title_from_message(message: str):
     """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.5-flash-lite",
         contents=prompt
     )
 
@@ -91,25 +93,31 @@ def chat(payload: ChatPayload):
             agent="pipeline"
         )
 
-        save_project(
+        project_id = save_project(
             user_id=user_id,
-            plan = pipeline_result["plan"],
             title=pipeline_result["title"],
             description=user_message,
             chat_id=chat_id,
-            code=pipeline_result["code"],
-            code_language="html"
+            plan = pipeline_result["plan"],
+        )
+        
+        project_json = pipeline_result["project"]
+        
+          # -------------------------
+        # 💾 SAVE GENERATED FILES (NEW)
+        # -------------------------
+        save_files(
+            project_id=project_id,
+            structure=project_json["structure"]
         )
         
         return {
             "ok": True,
             "type": "project",
             "chat_id": chat_id,
-            "code": pipeline_result["code"],
+            "project_id": project_id,
             "title": pipeline_result["title"],
-            "pipeline_output": pipeline_result,
             "reply": final_reply,
-            "messages": get_chat_messages(chat_id)
         }
 
     # ---------- CONVERSATIONAL MODE ----------
@@ -141,4 +149,17 @@ def get_chat_history(chat_id: str):
         "messages": messages
     }
 
+
+@router.get("/get-chats/{user_id}")
+def get_user_all_chats(user_id: str):
+    """
+    Fetch all chats for a specific user.
+    """
+    chats = get_user_chats(user_id)
+
+    return {
+        "ok": True,
+        "user_id": user_id,
+        "chats": chats
+    }       
 

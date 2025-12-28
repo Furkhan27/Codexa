@@ -1,5 +1,5 @@
 import json
-from utils.ai_client import gemini
+from utils.ai_client_util import gemini
 
 
 class ClassifierAgent:
@@ -43,7 +43,7 @@ User message: "{message}"
 
         try:
             response = gemini.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-2.5-flash-lite",
                 contents=prompt
             )
             print("Classifier response:", response.text.strip())

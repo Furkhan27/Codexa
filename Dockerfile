@@ -18,4 +18,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Use Gunicorn with Uvicorn worker for production
-CMD ["gunicorn","-k","uvicorn.workers.UvicornWorker","backend.app:app","--bind","0.0.0.0:8000","--workers","1"]
+CMD ["gunicorn","-k","uvicorn.workers.UvicornWorker","app:app","--bind","0.0.0.0:8000","--workers","1"]

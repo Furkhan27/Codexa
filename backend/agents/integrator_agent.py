@@ -1,6 +1,6 @@
-from agents.planner import PlannerAgent
-from agents.developer import DeveloperAgent
-from agents.debugger import DebuggerAgent
+from agents.planner_agent import PlannerAgent
+from agents.developer_agent import DeveloperAgent
+from agents.debugger_agent import DebuggerAgent
 
 class Integrator:
     def generate_project(self, name: str):

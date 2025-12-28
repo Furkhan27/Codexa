@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from utils.database_models import get_user_projects
+from utils.database_models_util import get_user_projects
 
 router = APIRouter(prefix="/projects")
 

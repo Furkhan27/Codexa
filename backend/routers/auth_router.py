@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from utils.database import users_col
-from utils.auth import hash_password, verify_password, create_token
+from utils.database_util import users_col
+from utils.auth_util import hash_password, verify_password, create_token
 from models.schemas import Signup, Login
 
 router = APIRouter(prefix="/auth")

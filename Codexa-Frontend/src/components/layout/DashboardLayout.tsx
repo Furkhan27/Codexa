@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { PreviewPanel } from "./PreviewPanel";
@@ -12,19 +12,28 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
+import { useAppData } from "@/context/useAppData";
+import { FileTree } from "../project/FileTree";
 
 export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const {projectId} = useParams();
+  const { projectId } = useParams();
+
+  const { projectFiles, selectedFile, setSelectedFile, singleProjectId } =
+    useAppData();
 
   // ✅ When a project is clicked in sidebar
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-  
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
+    null
+  );
+
   // Panels
   const [previewOpen, setPreviewOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [splitOpen, setSplitOpen] = useState(false);
+
+  const [previewUrl, setPreviewUrl] = useState("");
 
   // Code + HTML preview storage
   const [generatedCode, setGeneratedCode] = useState("");
@@ -42,15 +51,56 @@ export function DashboardLayout() {
     return saved ? JSON.parse(saved) : "dark";
   });
 
+  const startPreview = async (project_Id: string) => {
+    if (!project_Id) return;
+
+    const res = await fetch(
+      `http://localhost:8000/preview/full/${project_Id}`,
+      { method: "POST" }
+    );
+
+    const data = await res.json();
+    console.log("Preview response:", data);
+
+    if (data.ok) {
+      // ✅ frontend preview
+      setPreviewUrl(data.frontend);
+
+      // 🔹 backend URL stored for later use (proxy, health, etc.)
+      // setBackendUrl(data.backend);
+
+      setPreviewOpen(true);
+    }
+  };
+
+  const stopPreview = async (project_Id: string) => {
+    if (!project_Id) return;
+    const res = await fetch(
+      `http://localhost:8000/preview/stop/${project_Id}`,
+      {
+        method: "POST",
+      }
+    );
+    const data = await res.json();
+    if (data.ok) {
+      setPreviewUrl("");
+      setPreviewOpen(false);
+    }
+  };
+
   const handleThemeToggle = () => {
     const root = document.documentElement;
 
     if (isDark) {
       const darkThemes = ["dark", "original", "gray", "custom"];
-      const currentDark = darkThemes.find(t => root.classList.contains(t)) || "dark";
+      const currentDark =
+        darkThemes.find((t) => root.classList.contains(t)) || "dark";
 
       setPreviousDarkTheme(currentDark);
-      localStorage.setItem("nexus-previous-dark-theme", JSON.stringify(currentDark));
+      localStorage.setItem(
+        "nexus-previous-dark-theme",
+        JSON.stringify(currentDark)
+      );
 
       root.classList.remove("dark", "original", "gray", "custom");
       root.classList.add("light");
@@ -67,22 +117,26 @@ export function DashboardLayout() {
   };
 
   const openProjectInPanels = (
-  code: string,
-  language: string,
-  html: string
-) => {
-  setGeneratedCode(code);
-  setGeneratedLanguage(language);
-  setGeneratedHTML(html);
+    code: string,
+    language: string,
+    html: string
+  ) => {
+    setGeneratedCode(code);
+    setGeneratedLanguage(language);
+    setGeneratedHTML(html);
 
-  setSplitOpen(false);
-  setPreviewOpen(true);
-  setCodeOpen(true);
-};
-
-  const handlePreviewToggle = () => {
+    setSplitOpen(false);
+    setPreviewOpen(true);
+    setCodeOpen(true);
+  };
+  const handlePreviewToggle = async () => {
     if (splitOpen) setSplitOpen(false);
-    setPreviewOpen(!previewOpen);
+
+    if (!previewOpen && singleProjectId) {
+      await startPreview(singleProjectId);
+    } else if (previewOpen) {
+      await stopPreview(singleProjectId);
+    }
   };
 
   const handleCodeToggle = () => {
@@ -102,6 +156,7 @@ export function DashboardLayout() {
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-background relative">
+      <FileTree files={projectFiles} onFileSelect={setSelectedFile} />
       {/* Ambient background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -112,7 +167,7 @@ export function DashboardLayout() {
       <TopBar
         onSettingsClick={() => setSettingsOpen(true)}
         previewOpen={previewOpen}
-        onOpenProject={openProjectInPanels}   
+        onOpenProject={openProjectInPanels}
         codeOpen={codeOpen}
         splitOpen={splitOpen}
         onPreviewToggle={handlePreviewToggle}
@@ -124,7 +179,6 @@ export function DashboardLayout() {
 
       {/* Main */}
       <div className="flex-1 flex overflow-hidden relative z-10">
-        
         {/* Sidebar */}
         <Sidebar
           isOpen={sidebarOpen}
@@ -134,7 +188,6 @@ export function DashboardLayout() {
 
         {/* Resizable Panels */}
         <ResizablePanelGroup direction="horizontal" className="flex-1">
-
           {/* Chat Area */}
           <ResizablePanel defaultSize={hasSidePanel ? 60 : 100} minSize={35}>
             <main className="h-full flex flex-col overflow-hidden">
@@ -144,7 +197,6 @@ export function DashboardLayout() {
                   setGeneratedCode(code);
                   setGeneratedLanguage(lang);
                   setGeneratedHTML(html);
-
                   setCodeOpen(true);
                   setPreviewOpen(true);
                 }}
@@ -155,12 +207,15 @@ export function DashboardLayout() {
           {/* Preview Panel */}
           {previewOpen && !splitOpen && (
             <>
-              <ResizableHandle withHandle className="bg-border/30 hover:bg-primary/30 transition-colors" />
+              <ResizableHandle
+                withHandle
+                className="bg-border/30 hover:bg-primary/30 transition-colors"
+              />
               <ResizablePanel defaultSize={40} minSize={20} maxSize={50}>
                 <PreviewPanel
                   isOpen={previewOpen}
                   onClose={() => setPreviewOpen(false)}
-                  code={generatedHTML}
+                  previewUrl={previewUrl}
                 />
               </ResizablePanel>
             </>
@@ -169,13 +224,14 @@ export function DashboardLayout() {
           {/* Code Panel */}
           {codeOpen && !splitOpen && (
             <>
-              <ResizableHandle withHandle className="bg-border/30 hover:bg-primary/30 transition-colors" />
+              <ResizableHandle
+                withHandle
+                className="bg-border/30 hover:bg-primary/30 transition-colors"
+              />
               <ResizablePanel defaultSize={40} minSize={20} maxSize={50}>
                 <CodePanel
-                  isOpen={codeOpen}
+                  isOpen={!!selectedFile}
                   onClose={() => setCodeOpen(false)}
-                  code={generatedCode}
-                  language={generatedLanguage}
                 />
               </ResizablePanel>
             </>
@@ -184,7 +240,10 @@ export function DashboardLayout() {
           {/* Split Panel */}
           {splitOpen && (
             <>
-              <ResizableHandle withHandle className="bg-border/30 hover:bg-accent/30 transition-colors" />
+              <ResizableHandle
+                withHandle
+                className="bg-border/30 hover:bg-accent/30 transition-colors"
+              />
               <ResizablePanel defaultSize={40} minSize={25} maxSize={60}>
                 <SplitPanel
                   isOpen={splitOpen}
@@ -195,7 +254,6 @@ export function DashboardLayout() {
               </ResizablePanel>
             </>
           )}
-
         </ResizablePanelGroup>
       </div>
 

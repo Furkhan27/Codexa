@@ -1,45 +1,56 @@
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
-import { Copy, Check, X, FileCode, ChevronDown, Download, Settings2, Terminal, Braces } from "lucide-react";
+import { useState, useMemo } from "react";
+import {
+  Copy,
+  Check,
+  X,
+  Download,
+  Settings2,
+  Braces,
+  FolderTree,
+  Folder,
+  File as FileIcon,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Highlight, themes } from "prism-react-renderer";
+import { useAppData } from "@/context/useAppData";
 
-interface CodePanelProps {
+/* ----------------------------------------
+   Tree Types (STRICT & SAFE)
+---------------------------------------- */
+type FolderNode = {
+  type: "folder";
+  children: Record<string, TreeNode>;
+};
+
+type FileNode = {
+  type: "file";
+  file: any;
+};
+
+type TreeNode = FolderNode | FileNode;
+
+export function CodePanel({
+  isOpen,
+  onClose,
+}: {
   isOpen: boolean;
   onClose: () => void;
-  code: string;
-  language: string;
-}
+}) {
+  const { projectFiles, selectedFile, setSelectedFile } = useAppData();
 
-interface CodeFile {
-  id: string;
-  name: string;
-  language: string;
-  code: string;
-  icon: string;
-}
-
-export function CodePanel({ isOpen, onClose, code, language }: CodePanelProps) {
   const [copied, setCopied] = useState(false);
-  const [activeFile, setActiveFile] = useState<CodeFile | null>(null);
-  const [showFileMenu, setShowFileMenu] = useState(false);
+  const [showFolderView, setShowFolderView] = useState(
+    selectedFile === null
+  );
 
-  // ✅ Create a “virtual file” from backend code
-  useEffect(() => {
-    if (code) {
-      setActiveFile({
-        id: "generated",
-        name: `generated.${language === "tsx" ? "tsx" : language || "txt"}`,
-        language: language || "txt",
-        code: code,
-        icon: "📄",
-      });
-    }
-  }, [code, language]);
+  const activeFile = selectedFile;
 
+  /* ----------------------------------------
+     Actions
+  ---------------------------------------- */
   const handleCopy = () => {
     if (!activeFile) return;
-    navigator.clipboard.writeText(activeFile.code);
+    navigator.clipboard.writeText(activeFile.content);
     setCopied(true);
     toast.success("Code copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
@@ -47,139 +58,185 @@ export function CodePanel({ isOpen, onClose, code, language }: CodePanelProps) {
 
   const handleDownload = () => {
     if (!activeFile) return;
-    const blob = new Blob([activeFile.code], { type: "text/plain" });
+    const blob = new Blob([activeFile.content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = activeFile.name;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success(`Downloaded ${activeFile.name}`);
   };
 
-  if (!isOpen || !activeFile) return null;
+  /* ----------------------------------------
+     Build Folder Tree (NO UNION MUTATION)
+  ---------------------------------------- */
+  const folderTree = useMemo<FolderNode>(() => {
+    const root: FolderNode = {
+      type: "folder",
+      children: {},
+    };
 
-  return (
-    <div className="h-full flex flex-col bg-card/50 backdrop-blur-sm border-l border-border/50 relative overflow-hidden">
-      {/* Ambient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 pointer-events-none" />
+    projectFiles.forEach((file) => {
+      const parts = file.path.split("/");
+      let current: FolderNode = root;
 
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between shrink-0 bg-secondary/30 backdrop-blur-sm relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Braces className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Code</span>
-          </div>
+      parts.forEach((part, index) => {
+        if (index === parts.length - 1) {
+          current.children[part] = {
+            type: "file",
+            file,
+          };
+        } else {
+          if (!current.children[part]) {
+            current.children[part] = {
+              type: "folder",
+              children: {},
+            };
+          }
+          current = current.children[part] as FolderNode;
+        }
+      });
+    });
 
-          {/* Language pill */}
-          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
-            {activeFile.language.toUpperCase()}
-          </span>
+    return root;
+  }, [projectFiles]);
+
+  /* ----------------------------------------
+     Render Tree
+  ---------------------------------------- */
+  const renderTree = (node: FolderNode, depth = 0) => {
+    return Object.entries(node.children).map(([name, child]) => (
+      <div key={name} style={{ paddingLeft: depth * 14 }}>
+        <div
+          onClick={() => {
+            if (child.type === "file") {
+              setSelectedFile(child.file);
+              setShowFolderView(false);
+            }
+          }}
+          className="flex items-center gap-2 py-1 text-sm rounded-md cursor-pointer
+                     text-muted-foreground hover:text-foreground
+                     hover:bg-secondary/40 transition"
+        >
+          {child.type === "folder" ? (
+            <Folder className="w-4 h-4 text-primary" />
+          ) : (
+            <FileIcon className="w-4 h-4 text-muted-foreground" />
+          )}
+          <span className="font-medium">{name}</span>
         </div>
 
+        {child.type === "folder" &&
+          renderTree(child, depth + 1)}
+      </div>
+    ));
+  };
+
+  if (!isOpen) return <b>Loading ...</b>;
+
+  return (
+    <div className="h-full flex flex-col bg-card/50 border-l border-border/50 overflow-hidden">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-border/50 flex justify-between bg-secondary/30">
+        <div className="flex items-center gap-2">
+          <Braces className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold">Code</span>
+        </div>
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-200"
+          className="p-1.5 rounded-lg hover:bg-secondary"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      {/* File Menu (still kept for UI consistency) */}
-      <div className="px-2 py-2 border-b border-border/50 flex items-center gap-2 bg-background/30 overflow-x-auto scrollbar-thin relative z-10">
-        <button
-          onClick={() => setShowFileMenu(!showFileMenu)}
-          className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 shrink-0",
-            "bg-primary/10 text-primary border border-primary/30"
-          )}
-        >
-          <span>📄</span>
-          {activeFile.name}
-        </button>
-      </div>
-
       {/* Toolbar */}
-      <div className="px-4 py-2 border-b border-border/50 flex items-center justify-between bg-background/20 relative z-10">
-        <div className="relative">
-          <button
-            onClick={() => setShowFileMenu(!showFileMenu)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-secondary transition-all border border-border/50"
-          >
-            <FileCode className="w-3.5 h-3.5" />
-            <span>{activeFile.name}</span>
-            <ChevronDown className={cn("w-3 h-3 transition-transform", showFileMenu && "rotate-180")} />
-          </button>
-        </div>
+      <div className="px-4 py-2 border-b border-border/50 flex justify-between bg-background/20">
+        <button
+          onClick={() => setShowFolderView((v) => !v)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                     text-xs border border-border/50 hover:bg-secondary"
+        >
+          <FolderTree className="w-4 h-4" />
+          {showFolderView ? "Show Code" : "Show Files"}
+        </button>
+        <button
+          onClick={() => setShowFolderView((v) => !v)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                     text-xs text-muted-foreground  hover:bg-secondary"
+        >
+          <FileIcon className="w-4 h-4 text-muted-foreground" />
+          {activeFile.name.toUpperCase()}
+        </button>
 
-        <div className="flex items-center gap-1">
-          {/* Copy Button */}
-          <button
-            onClick={handleCopy}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all duration-200",
-              copied
-                ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary border border-transparent"
-            )}
-          >
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? "Copied!" : "Copy"}</span>
-          </button>
+        {activeFile && (
+          <div className="flex gap-1">
+            <button
+              onClick={handleCopy}
+              className="px-3 py-1.5 rounded-lg text-xs hover:bg-secondary"
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+            </button>
 
-          {/* Download */}
-          <button
-            onClick={handleDownload}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-200"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download</span>
-          </button>
+            <button
+              onClick={handleDownload}
+              className="px-3 py-1.5 rounded-lg text-xs hover:bg-secondary"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </button>
 
-          <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-200">
-            <Settings2 className="w-4 h-4" />
-          </button>
-        </div>
+            <button className="p-1.5 rounded-lg hover:bg-secondary">
+              <Settings2 className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Code Viewer */}
-      <div className="flex-1 overflow-auto scrollbar-thin bg-[#011627] relative z-10">
-        <Highlight theme={themes.nightOwl} code={activeFile.code} language={activeFile.language}>
-          {({ tokens, getLineProps, getTokenProps }) => (
-            <pre className="text-[13px] leading-relaxed p-4 min-h-full font-mono">
-              {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line })} className="table-row group hover:bg-white/5 transition-colors">
-                  <span className="table-cell pr-6 text-slate-500 select-none text-right w-12 sticky left-0 bg-[#011627] group-hover:text-slate-400 transition-colors">
-                    {i + 1}
-                  </span>
-                  <span className="table-cell">
+      {/* Viewer */}
+      <div className="flex-1 overflow-auto bg-[#011627]">
+        {showFolderView || !activeFile ? (
+          <div className="p-4 text-sm bg-background/40">
+            <div className="flex items-center gap-2 mb-3 text-primary font-semibold">
+              <FolderTree className="w-4 h-4" />
+              Project Structure
+            </div>
+            {renderTree(folderTree)}
+          </div>
+        ) : (
+          <Highlight
+            theme={themes.nightOwl}
+            code={activeFile.content}
+            language={activeFile.language}
+          >
+            {({ tokens, getLineProps, getTokenProps }) => (
+              <pre className="text-[13px] p-4 font-mono">
+                {tokens.map((line, i) => (
+                  <div key={i} {...getLineProps({ line })}>
+                    <span className="pr-6 text-slate-500 select-none">
+                      {i + 1}
+                    </span>
                     {line.map((token, key) => (
                       <span key={key} {...getTokenProps({ token })} />
                     ))}
-                  </span>
-                </div>
-              ))}
-            </pre>
-          )}
-        </Highlight>
+                  </div>
+                ))}
+              </pre>
+            )}
+          </Highlight>
+        )}
       </div>
 
-      {/* Footer Status Bar */}
-      <div className="px-4 py-2.5 border-t border-border/50 bg-secondary/30 backdrop-blur-sm flex items-center justify-between relative z-10">
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Terminal className="w-3.5 h-3.5 text-primary" />
-            <span>Ln 1, Col 1</span>
-          </div>
-          <span>UTF-8</span>
-          <span className="text-primary">{activeFile.language.toUpperCase()}</span>
+      {/* Footer */}
+      {activeFile && (
+        <div className="px-4 py-2 border-t border-border/50 bg-secondary/30 text-xs text-muted-foreground flex justify-between">
+          <span>{activeFile.language.toUpperCase()}</span>
+          <span>{activeFile.content.split("\n").length} lines</span>
         </div>
-
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>{activeFile.code.split("\n").length} lines</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

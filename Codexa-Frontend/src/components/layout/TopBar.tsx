@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { useAppData } from "@/context/useAppData";
 
 interface Project {
   id: string;
@@ -75,28 +76,15 @@ export function TopBar({
   const [searchFocused, setSearchFocused] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, userId } = useAuth();
+  const { userProjects,loadProjectfiles, setsingleProjectId } = useAppData();
 
   console.log(user);
 
+  
+
   useEffect(() => {
-    const getProjects = async () => {
-      try {
-        let res = await fetch(`http://localhost:8000/projects/${userId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        let data = await res.json();
-        projects = data.projects;
-        console.log(projects);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getProjects();
-  }, [userId]);
+    projects = userProjects;
+  }, [userId, userProjects]);
 
   const handleNewProject = () => {
     toast.success("Creating new project...", {
@@ -210,7 +198,9 @@ export function TopBar({
                         key={project.id}
                         onClick={() => {
                           setActiveProject(project);
+                          loadProjectfiles(project._id);
                           setShowProjectMenu(false);
+                          setsingleProjectId(project._id)
                           onOpenProject(
                             project.code,
                             project.code_language,
@@ -506,6 +496,7 @@ export function TopBar({
             </>
           )}
         </div>
+        
       </div>
     </header>
   );

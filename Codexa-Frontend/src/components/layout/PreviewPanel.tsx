@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Smartphone,
@@ -7,10 +7,8 @@ import {
   RefreshCw,
   ExternalLink,
   X,
-  Sparkles,
   CheckCircle2,
   Loader2,
-  Maximize2,
   Play,
   Pause,
 } from "lucide-react";
@@ -20,48 +18,33 @@ type DeviceMode = "desktop" | "tablet" | "mobile";
 interface PreviewPanelProps {
   isOpen: boolean;
   onClose: () => void;
-
-  /** NEW: Code coming from backend */
-  code?: string;
-  language?: string;
+  previewUrl: string;
 }
 
-export function PreviewPanel({ isOpen, onClose, code = "", language = "html" }: PreviewPanelProps) {
+export function PreviewPanel({
+  isOpen,
+  onClose,
+  previewUrl,
+}: PreviewPanelProps) {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
-
-  const [previewUrl, setPreviewUrl] = useState<string>("");
-
-  /** 🔥 Create live iframe URL whenever code updates */
- useEffect(() => {
-  console.log("PreviewPanel received code:", code);
-  if (!code) return;
-
-  // 🔥 Remove wrapping quotes and escape sequences
-  const clean = code
-    .replace(/^"|"$/g, "")
-    .replace(/\\n/g, "\n")
-    .replace(/\\"/g, '"');
-
-  const blob = new Blob([clean], { type: "text/html" });
-  const url = URL.createObjectURL(blob);
-  console.log(url);
-  
-  setPreviewUrl(url);
-  return () => URL.revokeObjectURL(url);
-}, []);
-
+  console.log(previewUrl)
   const handleRefresh = () => {
     setIsRefreshing(true);
 
-    // 🔁 Force iframe reload
+    // 🔁 Reload iframe by forcing src reset
     setTimeout(() => {
-      const blob = new Blob([code], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
-      setPreviewUrl(url);
+      const iframe = document.getElementById(
+        "codexa-preview-iframe"
+      ) as HTMLIFrameElement | null;
+
+      if (iframe) {
+        iframe.src = previewUrl;
+      }
+
       setIsRefreshing(false);
-    }, 500);
+    }, 400);
   };
 
   if (!isOpen) return null;
@@ -76,7 +59,9 @@ export function PreviewPanel({ isOpen, onClose, code = "", language = "html" }: 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-sm font-semibold text-foreground">Preview</span>
+            <span className="text-sm font-semibold text-foreground">
+              Preview
+            </span>
           </div>
           <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium">
             Live
@@ -95,14 +80,13 @@ export function PreviewPanel({ isOpen, onClose, code = "", language = "html" }: 
       <div className="px-4 py-2 border-b border-border/50 flex items-center justify-between bg-background/30 relative z-10">
         <div className="flex items-center gap-1 p-1 rounded-xl bg-secondary/50 border border-border/50">
           {[
-            { mode: "desktop" as DeviceMode, icon: Monitor, label: "Desktop" },
-            { mode: "tablet" as DeviceMode, icon: Tablet, label: "Tablet" },
-            { mode: "mobile" as DeviceMode, icon: Smartphone, label: "Mobile" },
-          ].map(({ mode, icon: Icon, label }) => (
+            { mode: "desktop" as DeviceMode, icon: Monitor },
+            { mode: "tablet" as DeviceMode, icon: Tablet },
+            { mode: "mobile" as DeviceMode, icon: Smartphone },
+          ].map(({ mode, icon: Icon }) => (
             <button
               key={mode}
               onClick={() => setDeviceMode(mode)}
-              title={label}
               className={cn(
                 "p-2 rounded-lg transition-all duration-200",
                 deviceMode === mode
@@ -124,22 +108,25 @@ export function PreviewPanel({ isOpen, onClose, code = "", language = "html" }: 
                 ? "text-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
-            title={isPlaying ? "Pause" : "Play"}
           >
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isPlaying ? (
+              <Pause className="w-4 h-4" />
+            ) : (
+              <Play className="w-4 h-4" />
+            )}
           </button>
 
           <button
             onClick={handleRefresh}
-            title="Refresh"
             className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-200"
           >
-            <RefreshCw className={cn("w-4 h-4", isRefreshing && "animate-spin")} />
+            <RefreshCw
+              className={cn("w-4 h-4", isRefreshing && "animate-spin")}
+            />
           </button>
 
           <button
             onClick={() => window.open(previewUrl, "_blank")}
-            title="Open in new tab"
             className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all duration-200"
           >
             <ExternalLink className="w-4 h-4" />
@@ -160,19 +147,22 @@ export function PreviewPanel({ isOpen, onClose, code = "", language = "html" }: 
           {/* Browser Chrome */}
           <div className="h-9 bg-secondary/50 border-b border-border/50 flex items-center px-3 gap-2">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors cursor-pointer" />
-              <div className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors cursor-pointer" />
+              <div className="w-3 h-3 rounded-full bg-red-500/80" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+              <div className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
             <div className="flex-1 mx-4">
               <div className="h-6 bg-background/80 rounded-lg flex items-center px-3 border border-border/50">
-                <span className="text-[11px] text-muted-foreground font-mono">localhost:3000</span>
+                <span className="text-[11px] text-muted-foreground font-mono">
+                  {previewUrl || "localhost"}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* 🔥 LIVE IFRAME PREVIEW AREA */}
+          {/* 🔥 REAL FRONTEND PREVIEW */}
           <iframe
+            id="codexa-preview-iframe"
             src={previewUrl}
             sandbox="allow-scripts allow-same-origin"
             className="w-full h-[calc(100%-2.25rem)] border-none bg-white"
@@ -190,13 +180,15 @@ export function PreviewPanel({ isOpen, onClose, code = "", language = "html" }: 
 
           <div className="flex items-center gap-2">
             <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
-            <span>Hot reload active</span>
+            <span>Dev server running</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs text-muted-foreground">Updated just now</span>
+          <span className="text-xs text-muted-foreground">
+            Updated just now
+          </span>
         </div>
       </div>
     </div>

@@ -1,10 +1,10 @@
 from google import genai
-from utils.database_models import (
+from utils.database_models_util import (
     get_chat_messages,
     format_for_gemini,
     save_message
 )
-from utils.ai_client import gemini
+from utils.ai_client_util import gemini
 
 
 
@@ -34,7 +34,7 @@ class ChatAgent:
         print("Conversation so far:\n", conversation_text)
         # 5. Call Gemini
         resp = gemini.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=conversation_text
         )
 

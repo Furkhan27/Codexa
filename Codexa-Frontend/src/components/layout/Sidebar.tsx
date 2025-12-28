@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { set } from "date-fns";
+import { useAppData } from "@/context/useAppData";
 
 interface Chat {
   id: string;
@@ -30,12 +31,9 @@ interface SidebarProps {
   onSettingsClick: () => void;
 }
 
-export function Sidebar({
-  isOpen,
-  onToggle,
-  onSettingsClick,
-}: SidebarProps) {
+export function Sidebar({ isOpen, onToggle, onSettingsClick }: SidebarProps) {
   const { userId } = useAuth();
+  const { userChats } = useAppData();
   const navigate = useNavigate();
   // Chat list is now PROJECT list
   const [chats, setChats] = useState<Chat[]>([]);
@@ -44,42 +42,33 @@ export function Sidebar({
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { chatId} = useParams();
+  const { chatId } = useParams();
   // ============================================
   // 🚀 LOAD PROJECTS FROM BACKEND
   // ============================================
   useEffect(() => {
     if (!userId) return;
-    const loadProjects = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/projects/${userId}`);
-        const data = await res.json();
 
-        if (data.ok) {
-          // Convert backend projects → Sidebar Chat format
-          const formatted = data.projects.map((p: any) => ({
-            id: p._id,
-            title: p.title || "Untitled Project",
-            emoji: "📁",
-            timestamp: new Date(p.created_at).toLocaleDateString(),
-            preview: p.description || "No description",
-          }));
+    // Convert backend projects → Sidebar Chat format
+    const formatted = userChats.map((p: any) => ({
+      id: p._id,
+      title: p.title || "Untitled Project",
+      emoji: "📁",
+      timestamp: new Date(p.created_at).toLocaleDateString(),
+      preview: p.description || "No description",
+    }));
 
-          setChats(formatted);
-          // if (formatted.length > 0) setActiveChat(formatted[0].id);
-        }
-      } catch (err) {
-        console.error("Failed to load projects:", err);
-      }
-    };
+    setChats(formatted);
+    // if (formatted.length > 0) setActiveChat(formatted[0].id);
+
     setActiveChat(chatId || "");
-    loadProjects();
-  }, [userId, chatId]);
+  
+  }, [userId, chatId, userChats]);
 
   const handleProjectClick = (chatID: string) => {
-  navigate(`/c/${chatID}`);
-  setActiveChat(chatID);
-};
+    navigate(`/c/${chatID}`);
+    setActiveChat(chatID);
+  };
   // ============================================
   // ➕ CREATE NEW LOCAL CHAT (Frontend Only)
   // ============================================
@@ -95,8 +84,8 @@ export function Sidebar({
 
     // setChats((prev) => [newChat, ...prev]);
     // setActiveChat(newChat.id);
-    
-    navigate("/")
+
+    navigate("/");
     setActiveChat("");
     // toast.success("New project created!");
   };

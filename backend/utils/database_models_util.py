@@ -1,4 +1,4 @@
-from utils.database import chats_col, messages_col, projects_col
+from utils.database_util import chats_col, messages_col, projects_col
 from datetime import datetime
 from bson import ObjectId
 
@@ -28,13 +28,6 @@ def get_user_chats(user_id: str):
 
     return chats
 
-def get_project(chat_id: str):
-    chat = chats_col.find_one({"_id": ObjectId(chat_id)})
-    if not chat:
-        return None
-    
-    chat["_id"] = str(chat["_id"])
-    return chat
 
 
 def update_project_timestamp(chat_id: str):
@@ -81,33 +74,35 @@ def format_for_gemini(messages):
 def get_chat_messages(chat_id: str):
     try:
         msgs = list(
-            messages_col.find({"chat_id": chat_id})
-                        .sort("timestamp", 1)  # oldest → newest
+            messages_col.find(
+                {"chat_id": chat_id}
+            ).sort("created_at", 1)
         )
+        print(f"Loaded {len(msgs)} messages for chat_id {chat_id}") 
 
-        # Convert ObjectId → string
         for m in msgs:
             m["_id"] = str(m["_id"])
-        
+
         return msgs
 
     except Exception as e:
         print("Error loading messages:", e)
-        return None
+        return []
 
 
 # ---------- PROJECTS ----------
-def save_project(user_id: str, title: str, description: str, chat_id:str,code: str=None,plan:dict=None, code_language:str = None):
+def save_project(user_id: str, title: str, description: str, chat_id:str,plan:dict=None):
     project = {
-        "user_id": user_id,
-        "title": title,
-        "description": description,
-        "plan":plan,
-        "code": code,
-        "code_language":code_language,
-        "chat_id":chat_id,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow()
+    "user_id": user_id,
+    "title": title,
+    "description": description,
+    "plan": plan,                     # planner steps (optional but useful)
+    "chat_id": chat_id,               # link chat ↔ project
+    "status": "generated",            # generated | editing | completed
+    "project_type": "fullstack",      # frontend | backend | fullstack
+    "created_at": datetime.utcnow(),
+    "updated_at": datetime.utcnow()
+
     }
 
     res = projects_col.insert_one(project)

@@ -223,7 +223,7 @@ export function SettingsPanel({
     loadSetting("custom-color", "#3b82f6")
   );
 
-  const { userId } = useAuth();
+  const { userId, user } = useAuth();
 
   // Apply accent color to CSS variables
   useEffect(() => {
@@ -582,7 +582,7 @@ export function SettingsPanel({
                       </label>
                       <input
                         type="text"
-                        defaultValue="John Doe"
+                        defaultValue={user.name? user.name : "User Name"}
                         className="w-full mt-1 px-3 py-2 rounded-lg bg-background border border-border/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                       />
                     </div>
@@ -593,7 +593,7 @@ export function SettingsPanel({
                       <div className="flex items-center gap-2 mt-1">
                         <input
                           type="email"
-                          defaultValue="john@example.com"
+                          defaultValue={user.email? user.email : "example@email.com"}
                           className="flex-1 px-3 py-2 rounded-lg bg-background border border-border/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                         />
                         <Mail className="w-4 h-4 text-muted-foreground" />
