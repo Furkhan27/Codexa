@@ -82,7 +82,7 @@ CODEXA follows a **modular, layered client–server architecture**.
 
 ### 📐 Architecture Diagram
 
-![CODEXA Architecture](assets/architecture_diagram.png)
+![CODEXA Architecture](Assets/architecture_diagram.png)
 
 ---
 
@@ -142,8 +142,8 @@ The system demonstrates:
 
 ## Screenshots
 
-![Dashboard](assets/dashboard.png)  
-![Chat Interface](assets/chat.png)  
+![Dashboard](Assets/dashboard.jpeg)  
+![Chat Interface](Assets/chat.jpeg)  
 
 ---
 
