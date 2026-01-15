@@ -178,6 +178,6 @@ The system demonstrates:
   
 ---
 
-## 📄 License
+## License
 
 This project is developed for **academic and educational purposes** as part of the Bachelor of Engineering (CSE) curriculum.
