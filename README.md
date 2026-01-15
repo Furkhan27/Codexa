@@ -143,6 +143,7 @@ The system demonstrates:
 ## Screenshots
 
 ![Dashboard](Assets/dashboard.jpeg)  
+
 ![Chat Interface](Assets/chat.jpeg)  
 
 ---
