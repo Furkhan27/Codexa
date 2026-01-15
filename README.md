@@ -172,8 +172,9 @@ The system demonstrates:
 ## Authors
 
 - **Mohammed Furqan Siddiq**
+- **Mohammed Haseeb Ali**
 - **Muhammad Afzal** 
-- **Mohammed Haseeb Ali** 
+ 
   
 ---
 
